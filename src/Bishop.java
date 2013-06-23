@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-
 public class Bishop extends Piece {
 	private static final long serialVersionUID = 1L;
 	

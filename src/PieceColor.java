@@ -1,4 +1,3 @@
-
 public enum PieceColor {
 	W("White"),
 	B("Black");

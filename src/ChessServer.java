@@ -17,11 +17,11 @@ public class ChessServer extends Thread {
 		new ChessServer().start();
 	}
 
-	public ChessServer() {}
+	public ChessServer() {
+		g = new Game();
+	}
 	@Override
 	public void run() {
-		g = new Game();
-
 		//setup serversocket
 		try {
 			server = new ServerSocket(port);

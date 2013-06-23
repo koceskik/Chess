@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-
 public class Pawn extends Piece {
 	private static final long serialVersionUID = 1L;
 	
@@ -15,7 +14,7 @@ public class Pawn extends Piece {
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		int dirOfMovement;
 		int specialPos;//location of double move
-		if(g.turn.playerColor == PieceColor.W) {
+		if(g.turn.color == PieceColor.W) {
 			dirOfMovement = -1;
 			specialPos = 6;
 		}

@@ -1,11 +1,14 @@
 import java.io.Serializable;
 
-
 public class Move implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static int NORMAL = 0;
 	public static int EN_PASSANT = 1;
 	public static int CASTLE = 2;
+	public static int PROMOTE_QUEEN = 3;
+	public static int PROMOTE_KNIGHT = 4;
+	public static int PROMOTE_ROOK = 5;
+	public static int PROMOTE_BISHOP = 6;
 	
 	public Tile fromTile;
 	public Tile toTile;
@@ -22,7 +25,7 @@ public class Move implements Serializable {
 	}
 	
 	public boolean equals(Move m) {
-		return fromTile.equals(m.fromTile) && toTile.equals(m.toTile) && moveType == m.moveType;
+		return fromTile.equals(m.fromTile) && toTile.equals(m.toTile);
 	}
 
 }

@@ -15,7 +15,7 @@ public abstract class Piece implements Serializable {
 		this.owner = owner;
 	}
 	public PieceColor getColor() {
-		return owner.playerColor;
+		return owner.color;
 	}
 	public Piece getOriginalType() {
 		return originalType;

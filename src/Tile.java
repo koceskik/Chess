@@ -3,7 +3,6 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-
 public class Tile  implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -29,17 +28,6 @@ public class Tile  implements Serializable {
 		this.x = x;
 		this.y = y;
 	}
-	public Tile(Tile t) {
-		x = t.x;
-		y = t.y;
-		if(t.piece == null) piece = null;
-		else if(t.piece instanceof Pawn) piece = new Pawn(t.piece.getOwner());
-		else if(t.piece instanceof Rook) piece = new Rook(t.piece.getOwner());
-		else if(t.piece instanceof Knight) piece = new Knight(t.piece.getOwner());
-		else if(t.piece instanceof Bishop) piece = new Bishop(t.piece.getOwner());
-		else if(t.piece instanceof Queen) piece = new Queen(t.piece.getOwner());
-		else if(t.piece instanceof King) piece = new King(t.piece.getOwner());
-	}
 	public PieceColor getColor() {
 		if((x+y)%2 == 0) {
 			return PieceColor.W;
@@ -49,10 +37,6 @@ public class Tile  implements Serializable {
 		}
 	}
 	public void addPiece(Piece p) {
-		if(piece != null && p != null) {//current piece is destroyed (by another piece), doesn't handle EN_PASSANT manually
-			piece.getOwner().pieceList.remove(piece);
-			piece.getOwner().deadPieces.add(piece);
-		}
 		piece = p;
 		if(piece != null) {
 			piece.loc = this;
