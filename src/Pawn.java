@@ -61,7 +61,7 @@ public class Pawn extends Piece {
 					if(p.getOwner() == g.getOpponent()) {
 						if(p instanceof Pawn) {
 							if(p.lastTurnMoved == g.turnCount-1 && p.numOfMovesMade == 1) {
-								Move m = new Move(t, g.board[y+dirOfMovement][x-1], Move.EN_PASSANT);//left en passant
+								Move m = new Move(t, g.board[y+dirOfMovement][x-1]);//left en passant
 								if(ignoreCheck) {
 									moveList.add(m);
 								}
@@ -90,7 +90,7 @@ public class Pawn extends Piece {
 					if(p.getOwner() == g.getOpponent()) {
 						if(p instanceof Pawn) {
 							if(p.lastTurnMoved == g.turnCount-1 && p.numOfMovesMade == 1) {
-								Move m = new Move(t, g.board[y+dirOfMovement][x+1], Move.EN_PASSANT);//right en passant
+								Move m = new Move(t, g.board[y+dirOfMovement][x+1]);//right en passant
 								if(ignoreCheck) {
 									moveList.add(m);
 								}

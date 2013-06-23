@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Player implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -7,17 +8,24 @@ public class Player implements Serializable {
 	public PieceColor color = null;
 	public ArrayList<Piece> pieceList = new ArrayList<Piece>();
 	public ArrayList<Piece> deadPieces = new ArrayList<Piece>();//holds all dead pieces
-	public ArrayList<Piece> heldPieces = new ArrayList<Piece>();//TODO: bughouse: add pieces in deadPieces, queue 
+	public ArrayList<Piece> heldPieces = new ArrayList<Piece>();//TODO: bughouse: add pieces in deadPieces, queue
 	public Piece king = null;
-	
-	public Player(PieceColor pc) {//TODO: add security here: unique ID or have server send unique ID each turn
+	public UUID id = UUID.randomUUID();
+	public int gameID;
+	public int gameCount = 0;//technically the number of games is this value+1
+
+	public Player(PieceColor pc) {
+		this(pc, 0);
+	}
+
+	public Player(PieceColor pc, int gameID) {//TODO: add security here: unique ID or have server send unique ID each turn
 		color = pc;
-		king = new King(this);
+		this.gameID = gameID;
 		pieceList.add(new Rook(this));
 		pieceList.add(new Knight(this));
 		pieceList.add(new Bishop(this));
 		pieceList.add(new Queen(this));
-		pieceList.add(king);
+		pieceList.add(king = new King(this));
 		pieceList.add(new Bishop(this));
 		pieceList.add(new Knight(this));
 		pieceList.add(new Rook(this));
@@ -25,9 +33,8 @@ public class Player implements Serializable {
 			pieceList.add(new Pawn(this));
 		}
 	}
-	
+
 	public boolean equals(Player p) {
-		if(color != p.color) return false;		
-		return true;
+		return id.equals(p.id);
 	}
 }

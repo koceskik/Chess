@@ -3,18 +3,23 @@ import java.util.ArrayList;
 
 public class Game implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static int count = 0;
 
-	public Player pW = new Player(PieceColor.W);
-	public Player pB = new Player(PieceColor.B);
+	public Player pW = null;
+	public Player pB = null;
 
 	public Tile[][] board = new Tile[8][8];
-	public Player turn = pW;
+	public Player turn = null;
 	public int turnCount = 0;
+	public int id;
 
 	public Game() {
+		this.id = count++;
+		turn = pW = new Player(PieceColor.W, id);
+		pB = new Player(PieceColor.B, id);
 		Player p = pB;
 		for(int i = 0;i<8;i++) {
-			if(i > 2) p = pW;
+			if(i == 4) p = pW;
 			for(int j = 0;j<8;j++) {
 				board[i][j] = new Tile(j,i);
 				if(i == 0 || i == 7) {
@@ -43,7 +48,9 @@ public class Game implements Serializable {
 	}
 
 	public boolean applyMove(Move m) {//returns true if applied
-		m.fromTile = board[m.fromTile.y][m.fromTile.x];//dereference from the Game, necessary for server 
+		if(!m.player.equals(turn)) return false;
+
+		m.fromTile = board[m.fromTile.y][m.fromTile.x];//dereference from the Game, necessary for server
 		m.toTile = board[m.toTile.y][m.toTile.x];
 		if(m.fromTile.getPiece() instanceof Pawn && board[m.toTile.y][m.toTile.x].getPiece() == null) {
 			if(m.fromTile.x != m.toTile.x) m.moveType = Move.EN_PASSANT;
@@ -151,7 +158,7 @@ public class Game implements Serializable {
 		Player currentPlayer = turn;
 		Player opp = this.getOpponent();
 
-		turn = opp;//needed for testing other player, yes its necessary (confirmed)
+		turn = opp;//needed for testing other player; yes its necessary (confirmed)
 		boolean inCheck = false;
 		for(Piece p : opp.pieceList) {
 			for(Move m : p.getLegalMoves(this, true)) {
@@ -166,9 +173,7 @@ public class Game implements Serializable {
 
 	public ArrayList<Move> getLegalMove(Tile t) {//returns a list of all legal moves, or empty if no legal moves
 		t = board[t.y][t.x];//dereference from the Game, necessary for server
-		ArrayList<Move> moveList = new ArrayList<Move>();
-		if(t.getPiece() == null) return moveList;
-		if(t.getPiece().getOwner() != turn) return moveList;
+		if(t.getPiece() == null || t.getPiece().getOwner() != turn) return new ArrayList<Move>();
 
 		return t.getPiece().getLegalMoves(this, false);
 	}

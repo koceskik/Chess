@@ -39,7 +39,7 @@ public class King extends Piece {
 		if(numOfMovesMade == 0 && !ignoreCheck && !g.inCheck()) {//TODO: is this right?
 			if(g.board[y][x+1].getPiece() == null && g.board[y][x+2].getPiece() == null && rightMoveFine) {
 				if(g.board[y][x+3].getPiece() != null && g.board[y][x+3].getPiece() instanceof Rook && g.board[y][x+3].getPiece().numOfMovesMade == 0) {
-					Move m = new Move(t, g.board[y][x+2], Move.CASTLE);
+					Move m = new Move(t, g.board[y][x+2]);
 					if(ignoreCheck) {
 						moveList.add(m);
 					}
@@ -51,7 +51,7 @@ public class King extends Piece {
 
 			if(g.board[y][x-1].getPiece() == null && g.board[y][x-2].getPiece() == null && g.board[y][x-3].getPiece() == null && leftMoveFine) {
 				if(g.board[y][x-4].getPiece() != null && g.board[y][x-4].getPiece() instanceof Rook && g.board[y][x-4].getPiece().numOfMovesMade == 0) {
-					Move m = new Move(t, g.board[y][x-2], Move.CASTLE);
+					Move m = new Move(t, g.board[y][x-2]);
 					if(ignoreCheck) {
 						moveList.add(m);
 					}

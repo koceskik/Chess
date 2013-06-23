@@ -8,19 +8,20 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ChessServer extends Thread {
-	private final int PLAYER_TOTAL = 2;
-	private Game g = null;
+public class BughouseServer extends Thread {
+	private final int PLAYER_TOTAL = 4;
+	private ArrayList<Game> g = new ArrayList<Game>();
 	private final int port = 3355;
 	private ServerSocket server = null;
 	private ArrayList<ClientHandler> playerList = new ArrayList<ClientHandler>();
 
 	public static void main(String[] args) {
-		new ChessServer().start();
+		new BughouseServer().start();
 	}
 
-	public ChessServer() {
-		g = new Game();
+	public BughouseServer() {
+		g.add(new Game());
+		g.add(new Game());
 
 		//setup serversocket
 		try {
@@ -40,7 +41,7 @@ public class ChessServer extends Thread {
 	@Override
 	public void run() {
 		//get clients, setup ClientHandlers
-		while(playerList.size() < 2) {
+		while(playerList.size() < PLAYER_TOTAL) {
 			try {
 				Socket s = server.accept();
 				ClientHandler ch = new ClientHandler(s);
@@ -52,16 +53,27 @@ public class ChessServer extends Thread {
 				System.exit(1);
 			}
 		}
+
 		Collections.shuffle(playerList);
 		for(int i = 0;i<PLAYER_TOTAL;i++) {
 			ClientHandler ch = playerList.get(i);
-			if(i % 2 == 0) {
-				ch.send(g.pW);
+			Game clientGame = null;
+			if(i < 2) {
+				clientGame = g.get(0);
 			}
 			else {
-				ch.send(g.pB);
+				clientGame = g.get(1);
 			}
-			ch.send(g);
+			if(i % 2 == 0) {
+				clientGame.pW.gameCount++;
+				ch.send(clientGame.pW);
+			}
+			else {
+				clientGame.pB.gameCount++;
+				ch.send(clientGame.pB);
+			}
+			ch.send(g.get(0));
+			ch.send(g.get(1));
 		}
 	}
 
@@ -97,23 +109,23 @@ public class ChessServer extends Thread {
 				try {
 					while(true) {
 						Move move = (Move) ois.readObject();
-						g.applyMove(move);//handles legal checks
+						g.get(move.player.gameID).applyMove(move);//handles legal checks
 
 						for(ClientHandler ch : playerList) {
 							if(ch == null) {
 								playerList.remove(ch);
 							}
 							else {
-								ch.send(g);
+								ch.send(g.get(move.player.gameID));//only sends the game that was changed
 							}
 						}
 					}
 				}
 				catch(ClassNotFoundException e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 				catch(IOException e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 				finally {
 					if(ois != null) {
@@ -141,7 +153,7 @@ public class ChessServer extends Thread {
 			boolean returner = false;
 			try {
 				oos.writeObject(g);
-				oos.reset();
+				oos.reset();//necessary to send new Game object, not just references
 				returner = true;
 			}
 			catch(IOException e) {
@@ -183,7 +195,6 @@ public class ChessServer extends Thread {
 		}
 	}
 
-
 	public void closeSockets() {
 		for(ClientHandler c : playerList) {
 			if(c != null) {
@@ -201,5 +212,4 @@ public class ChessServer extends Thread {
 		System.out.println("Server Exited");
 		System.exit(0);
 	}
-
 }

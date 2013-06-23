@@ -30,12 +30,15 @@ public class Chess extends JFrame {
 
 	private GridBagConstraints grid = null;
 	private JPanel mainScreen = null;
-	private JButton startNewGame = null;
+	private JButton chessGame = null;
+	private JButton bughouseGame = null;
 	private JButton joinGame = null;
 	private JTextField ipAddress = null;
 	private JPanel gameScreen = null;
+	private JPanel[] boardPanel = new JPanel[2];
 
-	private static final Dimension dim = new Dimension(32,32); 
+	private static final Dimension dim = new Dimension(Tile.size,Tile.size);
+	private static final Dimension scaledDim = new Dimension(Tile.scaledSize,Tile.scaledSize);
 	private static final Border selectedBorder = BorderFactory.createLineBorder(Color.red);
 	private static final Border legalMoveBorder = BorderFactory.createLineBorder(Color.blue);
 	private static final Border nullBorder = BorderFactory.createEmptyBorder();
@@ -43,32 +46,36 @@ public class Chess extends JFrame {
 	private ArrayList<Move> legalMoveList = new ArrayList<Move>();
 	private void clearLegalMoves() {
 		for(Move m : legalMoveList) {
-			getLabel(m.toTile.x,m.toTile.y).setBorder(nullBorder);
+			getLabel(m.toTile.x,m.toTile.y, 0).setBorder(nullBorder);
 		}
 		legalMoveList.clear();
 	}
 
-	private volatile Game g = null;
+	private volatile ArrayList<Game> g = new ArrayList<Game>();
 	private volatile Player p = null;
 
-	private JPanel whiteLabelPanel = new JPanel();
-	private JLabel whiteLabel = new JLabel();
-	private JPanel blackLabelPanel = new JPanel();
-	private JLabel blackLabel = new JLabel();
-	private JLabel[] xAxisLabel = new JLabel[8];
-	private JLabel[] yAxisLabel = new JLabel[8];
-	private JLabel[][] label = new JLabel[8][8];
-	public JLabel getLabel(int x, int y) {
-		if(p.color == PieceColor.W) {
-			return label[y][x];
+	private final String[] promotionString = {"Queen", "Knight", "Rook", "Bishop"};
+	private JComboBox<String> promotionList = new JComboBox<String>(promotionString);
+
+	private ArrayList<JPanel> whiteLabelPanel = new ArrayList<JPanel>();
+	private ArrayList<JLabel> whiteLabel = new ArrayList<JLabel>();
+	private ArrayList<JPanel> blackLabelPanel = new ArrayList<JPanel>();
+	private ArrayList<JLabel> blackLabel = new ArrayList<JLabel>();
+	private ArrayList<JLabel[]> xAxisLabel = new ArrayList<JLabel[]>();
+	private ArrayList<JLabel[]> yAxisLabel = new ArrayList<JLabel[]>();
+	private ArrayList<JLabel[][]> label = new ArrayList<JLabel[][]>();
+
+	public JLabel getLabel(int x, int y, int id) {
+		if(p.color == PieceColor.W && id == 0) {
+			return label.get(id)[y][x];//this may need to be flipped dependingly
 		}
-		else {
-			return label[7-y][7-x];
+		else if(p.color == PieceColor.B && id == 1) {
+			return label.get(id)[y][x];//this may need to be flipped dependingly
+		}
+		else {//note: flipped from getLabel() because p.color is opposite p.partner.color
+			return label.get(id)[7-y][7-x];
 		}
 	}
-
-	private String[] promotionString = {"Queen", "Knight", "Rook", "Bishop"};
-	private JComboBox<String> promotionList = new JComboBox<String>(promotionString);
 
 	public static void main(String[] args) {
 		Chess c = new Chess();
@@ -80,36 +87,44 @@ public class Chess extends JFrame {
 
 		getContentPane().setLayout(new CardLayout());
 		grid = new GridBagConstraints();
-		
+
 		initMainScreen();
-		initGameScreen();
+		initChessScreen();
 		pack();
-		//initializeBughouseScreen() here so pack() doesn't make window wide
 
 		((CardLayout)getContentPane().getLayout()).show(getContentPane(), "MAIN");
-		
 	}
 	public void initMainScreen() {
 		mainScreen = new JPanel();
 		mainScreen.setLayout(new GridBagLayout());
 		getContentPane().add(mainScreen, "MAIN");
+		grid.gridx = 0;
+		grid.gridy = 0;
 
-		startNewGame = new JButton();
-		startNewGame.setText("New Game");
-		startNewGame.addActionListener(new ActionListener() {
+		chessGame = new JButton();
+		chessGame.setText("New Chess Game");
+		chessGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new ChessServer().start();
 				startGame();
 			}
 		});
-		grid.gridx = 0;
-		grid.gridy = 0;
-		mainScreen.add(startNewGame,grid);
+		mainScreen.add(chessGame,grid);
+
+		bughouseGame = new JButton();
+		bughouseGame.setText("New Bughouse Game");
+		bughouseGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new BughouseServer().start();
+				startGame();
+			}
+		});
+		grid.gridy++;
+		mainScreen.add(bughouseGame,grid);
 
 		joinGame = new JButton();
 		joinGame.setText("Join Game");
-		grid.gridx = 0;
-		grid.gridy = 1;
+		grid.gridy++;
 		mainScreen.add(joinGame,grid);
 		joinGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -123,15 +138,18 @@ public class Chess extends JFrame {
 
 		ipAddress = new JTextField(10);
 		ipAddress.setText("127.0.0.1");
-		grid.gridx = 0;
-		grid.gridy = 2;
+		grid.gridy++;
 		mainScreen.add(ipAddress,grid);
 	}
-	
+
 	public void startGame() {
 		connectToServer();//blocks until it receives Player and Game
-		drawBoard(g.board);
+		if(g.size() > 1) initBughouseScreen();
+		for(Game game : g) {
+			drawBoard(game);
+		}
 		initLabelClicks();
+		initChessboardLabels();
 		((CardLayout)getContentPane().getLayout()).show(getContentPane(), "GAME");
 		pack();
 	}
@@ -152,104 +170,141 @@ public class Chess extends JFrame {
 		self.start();
 	}
 
-
-	public void initGameScreen() {
+	public void initChessScreen() {
 		gameScreen = new JPanel();
-		gameScreen.setLayout(new GridBagLayout());
 		getContentPane().add(gameScreen, "GAME");
+		boardPanel[0] = new JPanel();
+		boardPanel[0].setLayout(new GridBagLayout());
+		gameScreen.add(boardPanel[0]);
 
-		whiteLabel.setText("White");
-		whiteLabelPanel.setBackground(Color.white);
-		whiteLabelPanel.add(whiteLabel);
+		whiteLabel.add(new JLabel());
+		whiteLabel.get(0).setText("White");
+		whiteLabelPanel.add(new JPanel());
+		whiteLabelPanel.get(0).setBackground(Color.white);
+		whiteLabelPanel.get(0).add(whiteLabel.get(0));
 		grid.gridwidth = 2;
 		grid.gridx = 1;
 		grid.gridy = 0;
-		gameScreen.add(whiteLabelPanel,grid);
+		boardPanel[0].add(whiteLabelPanel.get(0),grid);
 
-		blackLabel.setText("Black");
-		blackLabel.setForeground(Color.white);
-		blackLabelPanel.setBackground(Color.black);
-		blackLabelPanel.add(blackLabel);
+		blackLabel.add(new JLabel());
+		blackLabel.get(0).setText("Black");
+		blackLabel.get(0).setForeground(Color.white);
+		blackLabelPanel.add(new JPanel());
+		blackLabelPanel.get(0).setBackground(Color.black);
+		blackLabelPanel.get(0).add(blackLabel.get(0));
 		grid.gridwidth = 2;
 		grid.gridx = 3;
 		grid.gridy = 0;
-		gameScreen.add(blackLabelPanel,grid);
+		boardPanel[0].add(blackLabelPanel.get(0),grid);
 
 		grid.gridwidth = 3;
 		grid.gridx = 5;
 		grid.gridy = 0;
 		promotionList.setSelectedIndex(0);
-		gameScreen.add(promotionList, grid);
+		boardPanel[0].add(promotionList, grid);
+
+		grid.gridwidth = 1;
+		initBoard();
+	}
+	
+	public void initBughouseScreen() {
+		boardPanel[1] = new JPanel();
+		boardPanel[1].setLayout(new GridBagLayout());
+		gameScreen.add(boardPanel[1]);
+		
+		whiteLabel.add(new JLabel());
+		whiteLabel.get(1).setText("White");
+		whiteLabelPanel.add(new JPanel());
+		whiteLabelPanel.get(1).setBackground(Color.white);
+		whiteLabelPanel.get(1).add(whiteLabel.get(1));
+		grid.gridwidth = 3;
+		grid.gridx = 1;
+		grid.gridy = 0;
+		boardPanel[1].add(whiteLabelPanel.get(1),grid);
+
+		blackLabel.add(new JLabel());
+		blackLabel.get(1).setText("Black");
+		blackLabel.get(1).setForeground(Color.white);
+		blackLabelPanel.add(new JPanel());
+		blackLabelPanel.get(1).setBackground(Color.black);
+		blackLabelPanel.get(1).add(blackLabel.get(1));
+		grid.gridwidth = 3;
+		grid.gridx = 4;
+		grid.gridy = 0;
+		boardPanel[1].add(blackLabelPanel.get(1),grid);
 
 		grid.gridwidth = 1;
 		initBoard();
 	}
 
 	public void initBoard() {
+		xAxisLabel.add(new JLabel[8]);
+		yAxisLabel.add(new JLabel[8]);
+		label.add(new JLabel[8][8]);
+		int itemNum = label.size()-1;
 		for(int i = 0;i<8;i++) {
-			yAxisLabel[i] = new JLabel();
-			yAxisLabel[i].setText(String.valueOf(8-i));
+			yAxisLabel.get(itemNum)[i] = new JLabel();
+			yAxisLabel.get(itemNum)[i].setText(String.valueOf(8-i));
 			grid.gridx = 0;
 			grid.gridy = i+1;
-			gameScreen.add(yAxisLabel[i],grid);
+			boardPanel[itemNum].add(yAxisLabel.get(itemNum)[i],grid);
 			for(int j = 0;j<8;j++) {
-				label[i][j] = new JLabel();
-				label[i][j].setPreferredSize(dim);
+				label.get(itemNum)[i][j] = new JLabel();
+				Dimension d = dim;
+				if(itemNum > 0) { 
+					d = scaledDim;
+				}
+				label.get(itemNum)[i][j].setPreferredSize(d);
 				grid.gridx = j+1;
 				grid.gridy = i+1;
-				gameScreen.add(label[i][j],grid);
+				boardPanel[itemNum].add(label.get(itemNum)[i][j],grid);
 			}
 		}
 		for(int i = 0;i<8;i++) {
-			xAxisLabel[i] = new JLabel();
-			xAxisLabel[i].setText(String.valueOf((char) (97+i)));
+			xAxisLabel.get(itemNum)[i] = new JLabel();
+			xAxisLabel.get(itemNum)[i].setText(String.valueOf((char) (97+i)));
 			grid.gridx = i+1;
 			grid.gridy = 9;
-			gameScreen.add(xAxisLabel[i],grid);
+			boardPanel[itemNum].add(xAxisLabel.get(itemNum)[i],grid);
 		}
 	}
 
 	public void initLabelClicks() {
 		for(int i = 0;i<8;i++) {
-			if(p.color == PieceColor.B) {
-				yAxisLabel[i].setText(String.valueOf(i+1));
-				grid.gridx = 0;
-				grid.gridy = i+1;
-				gameScreen.add(yAxisLabel[i],grid);
-			}
 			for(int j = 0;j<8;j++) {
 				final int x = j;
 				final int y = i;
-				getLabel(x,y).addMouseListener(new MouseListener() {
+				getLabel(x,y,0).addMouseListener(new MouseListener() {
 					@Override
 					public void mousePressed(MouseEvent arg0) {
-						if(g.turn.equals(p)) {
+						if(g.get(p.gameID).turn.equals(p)) {
 							if(selectedTile == null) {
-								if(g.board[y][x].getPiece() != null) {
-									if(g.board[y][x].getPiece().getColor() == p.color) {
-										selectedTile = g.board[y][x];
-										getLabel(x,y).setBorder(selectedBorder);
+								if(g.get(p.gameID).board[y][x].getPiece() != null) {
+									if(g.get(p.gameID).board[y][x].getPiece().getColor() == p.color) {
+										selectedTile = g.get(p.gameID).board[y][x];
+										getLabel(x,y,0).setBorder(selectedBorder);
 
-										for(Move m : g.getLegalMove(selectedTile)) {
+										for(Move m : g.get(p.gameID).getLegalMove(selectedTile)) {
 											legalMoveList.add(m);
-											getLabel(m.toTile.x, m.toTile.y).setBorder(legalMoveBorder);
+											getLabel(m.toTile.x, m.toTile.y, 0).setBorder(legalMoveBorder);
 										}
 									}
 								}
 							}
-							else if(selectedTile == g.board[y][x]) {
+							else if(selectedTile == g.get(p.gameID).board[y][x]) {
 								clearLegalMoves();
-								getLabel(x,y).setBorder(nullBorder);
+								getLabel(x,y,0).setBorder(nullBorder);
 								selectedTile = null;
 							}
 							else {
-								Move m = new Move(selectedTile, g.board[y][x]);
+								Move m = new Move(selectedTile, g.get(p.gameID).board[y][x], p);
 								if(selectedTile.getPiece() instanceof Pawn && (y == 0 || y == 7)) {
 									m.moveType = Move.PROMOTE_QUEEN + promotionList.getSelectedIndex();
 								}
-								if(g.applyMove(m)) {
+								if(g.get(p.gameID).applyMove(m)) {
 									self.send(m);
-									getLabel(selectedTile.x,selectedTile.y).setBorder(nullBorder);
+									getLabel(selectedTile.x,selectedTile.y, 0).setBorder(nullBorder);
 									selectedTile = null;
 									clearLegalMoves();
 								}
@@ -267,28 +322,31 @@ public class Chess extends JFrame {
 				});
 			}
 		}
-		if(p.color == PieceColor.B) {
-			for(int i = 0;i<8;i++) {
-				xAxisLabel[i].setText(String.valueOf((char) (97+7-i)));
-				grid.gridx = i+1;
-				grid.gridy = 9;
-				gameScreen.add(xAxisLabel[i],grid);
-			}
+	}
+	
+	public void initChessboardLabels() {
+		for(int i = 0;i<g.size();i++) {
+			
 		}
 	}
-
-	public void drawBoard(Tile[][] board) {
-		if(g.turn.color == PieceColor.W) {
-			whiteLabelPanel.setBorder(selectedBorder);
-			blackLabelPanel.setBorder(nullBorder);
+	
+	public void drawBoard(Game game) {//TODO: change g in this situation
+		int id;
+		if(g.get(p.gameID).id == game.id) id = 0;//TODO: un-hardcode
+		else id = 1;
+		//display who's turn it is
+		if(g.get(id).turn.color == PieceColor.W) {
+			whiteLabelPanel.get(id).setBorder(selectedBorder);
+			blackLabelPanel.get(id).setBorder(nullBorder);
 		}
 		else {
-			whiteLabelPanel.setBorder(nullBorder);
-			blackLabelPanel.setBorder(selectedBorder);
+			whiteLabelPanel.get(id).setBorder(nullBorder);
+			blackLabelPanel.get(id).setBorder(selectedBorder);
 		}
+		//draws board
 		for(int i = 0;i<8;i++) {
 			for(int j = 0;j<8;j++) {
-				getLabel(j,i).setIcon(board[i][j].getIcon()); 
+				getLabel(j,i, id).setIcon(id == 0 ? game.board[i][j].getIcon() : game.board[i][j].getSmallIcon());
 			}
 		}
 	}
@@ -319,10 +377,13 @@ public class Chess extends JFrame {
 		}
 		public void getInitialInfo() {
 			p = ih.getPlayer();
-			g = ih.read();//guarantee that there is a board
+			for(int i = 0;i<p.gameCount+1;i++) {
+				Game game = ih.read();//guarantee that there is a board
+				g.add(game);
+			}
 		}
 		class InputHandler extends Thread {
-			private ObjectInputStream ois = null;
+			private ObjectInputStream ois = null;//TODO: use public get() method, remove read(). Or incorporate read() in run()
 			public InputHandler(Socket s) {
 				try {
 					ois = new ObjectInputStream(s.getInputStream());
@@ -333,10 +394,15 @@ public class Chess extends JFrame {
 			}
 			@Override
 			public void run() {
-				while(g != null) {
-					g = read();
-					if(g != null) {
-						drawBoard(g.board);
+				boolean doLoop = true;
+				while(doLoop) {
+					Game recGame = read();
+					if(recGame != null) {
+						g.set(recGame.id, recGame);
+						drawBoard(recGame);
+					}
+					else {
+						doLoop = false;
 					}
 				}
 			}
@@ -353,15 +419,17 @@ public class Chess extends JFrame {
 				return null;
 			}
 
-			public Game read() {
+			public Game read() {//TODO: incorporate this into the InputHandler.run() itself
 				try {
 					return (Game) ois.readObject();
 				}
 				catch(ClassNotFoundException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					self.close();
 				}
 				catch(IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					self.close();
 				}
 				return null;
 			}
