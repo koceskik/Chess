@@ -1,15 +1,6 @@
 public enum PieceColor {
-	W("White"),
-	B("Black");
-	
-	private String name;
-	private PieceColor(String name) {
-		this.name = name;
-	}
-	
-	public String toReadableString() {
-		return this.name;
-	}
+	W,
+	B;
 	
 	public PieceColor getOpponent() {
 		if(this == W) return B;

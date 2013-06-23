@@ -9,6 +9,7 @@ public class Player implements Serializable {
 	public ArrayList<Piece> pieceList = new ArrayList<Piece>();
 	public ArrayList<Piece> deadPieces = new ArrayList<Piece>();//holds all dead pieces
 	public ArrayList<Piece> heldPieces = new ArrayList<Piece>();//TODO: bughouse: add pieces in deadPieces, queue
+	public ArrayList<Piece> queuingPieces = new ArrayList<Piece>();
 	public Piece king = null;
 	public UUID id = UUID.randomUUID();
 	public int gameID;

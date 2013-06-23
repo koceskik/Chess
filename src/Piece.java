@@ -8,7 +8,7 @@ public abstract class Piece implements Serializable {
 	protected Piece originalType = null;//necessary for pawns (bughouse)
 	protected Tile loc = null;
 	protected int numOfMovesMade = 0;
-	protected int lastTurnMoved = -1; 
+	protected int lastTurnMoved = -1;
 
 	public Piece() {}
 	public Piece(Player owner) {

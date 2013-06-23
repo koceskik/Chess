@@ -110,6 +110,10 @@ public class BughouseServer extends Thread {
 					while(true) {
 						Move move = (Move) ois.readObject();
 						g.get(move.player.gameID).applyMove(move);//handles legal checks
+						
+						for(Piece p : g.get(move.player.gameID).turn.deadPieces) {
+							//TODO: logic for getting the opponent's partner
+						}
 
 						for(ClientHandler ch : playerList) {
 							if(ch == null) {

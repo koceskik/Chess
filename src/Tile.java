@@ -9,9 +9,9 @@ public class Tile implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private static final int scaleStyle = Image.SCALE_SMOOTH;
-	static final int size = 32;
-	static final int scaledSize = 16;
-	public static HashMap<String,ImageIcon> images = new HashMap<String,ImageIcon>();
+	public static final int size = 32;
+	public static final int scaledSize = 16;
+	private static HashMap<String,ImageIcon> images = new HashMap<String,ImageIcon>();
 	static {
 		char[] color = {'B','W'};
 		char[] piece = {'P','N','B','R','Q','K'};
@@ -34,17 +34,16 @@ public class Tile implements Serializable {
 	public final int x;
 	public final int y;
 	private Piece piece = null;
+	private final PieceColor tileColor;
 	
 	public Tile(int x, int y) {
 		this.x = x;
 		this.y = y;
-	}
-	public PieceColor getColor() {
 		if((x+y)%2 == 0) {
-			return PieceColor.W;
+			tileColor = PieceColor.W;
 		}
 		else {
-			return PieceColor.B;
+			tileColor =  PieceColor.B;
 		}
 	}
 	public void addPiece(Piece p) {
@@ -56,20 +55,31 @@ public class Tile implements Serializable {
 	public Piece getPiece() {
 		return piece;
 	}
+	
 	public ImageIcon getIcon() {
 		if(piece == null) {
-			return images.get(getColor().toString());
+			return images.get(tileColor.toString());
 		}
 		else {
-			return images.get(""+getColor() + piece.getColor() + piece.getTileCode());
+			return images.get(""+tileColor + piece.getColor() + piece.getTileCode());
 		}
 	}
 	public ImageIcon getSmallIcon() {
 		if(piece == null) {
-			return images.get(getColor().toString()+"s");
+			return images.get(tileColor.toString()+"s");
 		}
 		else {
-			return images.get(""+getColor() + piece.getColor() + piece.getTileCode()+"s");
+			return images.get(""+tileColor + piece.getColor() + piece.getTileCode()+"s");
 		}
+	}
+	public static ImageIcon getHeldIcon(Piece piece, boolean usable) {
+		String tileBG;
+		if(usable) {
+			tileBG = "W";
+		}
+		else {
+			tileBG = "B";
+		}
+		return images.get(tileBG + piece.getColor() + piece.getTileCode() + "s");
 	}
 }
