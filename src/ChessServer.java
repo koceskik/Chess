@@ -38,8 +38,7 @@ public class ChessServer extends Thread {
 		}
 
 		//get clients, setup ClientHandlers
-		while(playerList.size() < 2) {//TODO: make this 2-player
-			//while(true) {
+		while(playerList.size() < 2) {
 			try {
 				Socket s = server.accept();
 				ClientHandler ch = new ClientHandler(s);
@@ -95,16 +94,9 @@ public class ChessServer extends Thread {
 			public void run() {
 				try {
 					while(true) {
-						g = (Game) ois.readObject();
-						
-						if(g.turn == PieceColor.W) {
-							g.turn = PieceColor.B;
-						}
-						else {
-							g.turn = PieceColor.W;
-						}
+						Move move = (Move) ois.readObject();
+						g.applyMove(move);//handles legal checks
 
-						//TODO: legal checks
 						for(ClientHandler ch : playerList) {
 							if(ch == null) {
 								playerList.remove(ch);
@@ -147,6 +139,7 @@ public class ChessServer extends Thread {
 			boolean returner = false;
 			try {
 				oos.writeObject(g);
+				oos.reset();
 				returner = true;
 			}
 			catch(IOException e) {

@@ -29,13 +29,13 @@ public class Chess extends JFrame {
 	private ArrayList<Move> legalMoveList = new ArrayList<Move>();
 	private void clearLegalMoves() {
 		for(Move m : legalMoveList) {
-			label[m.y2][m.x2].setBorder(nullBorder);
+			label[m.toTile.y][m.toTile.x].setBorder(nullBorder);
 		}
 		legalMoveList.clear();
 	}
 
-	private Game g = null;
-	private Player p = null;
+	private volatile Game g = null;
+	private volatile Player p = null;
 
 	private JLabel playerLabel = new JLabel();
 	private JLabel currentTurnLabel = new JLabel();
@@ -67,7 +67,7 @@ public class Chess extends JFrame {
 		try {
 			Socket clientSocket = new Socket(serverIP, port);
 			self = new ClientHandler(clientSocket);
-			System.out.println("Accepted client socket");
+			System.out.println("Client socket accepted");
 			System.out.println("Created I/O streams");
 		}
 		catch(IOException ex) {
@@ -77,24 +77,24 @@ public class Chess extends JFrame {
 
 		grid = new GridBagConstraints();
 		getContentPane().setLayout(new GridBagLayout());
-
+		
 		p = self.getPlayer();
 		g = self.read();//guarantee that there is a board
-		
+
 		playerLabel.setText("You are: " + p.playerColor.toReadableString());
 		grid.gridwidth = 5;
 		grid.gridx = 0;
 		grid.gridy = 0;
 		getContentPane().add(playerLabel,grid);
-		
-		currentTurnLabel.setText("Current Move: " + g.turn.toReadableString());
+
+		currentTurnLabel.setText("Current Move: " + g.turn.playerColor.toReadableString());
 		grid.gridwidth = 5;
 		grid.gridx = 5;
 		grid.gridy = 0;
 		getContentPane().add(currentTurnLabel,grid);
-		
+
 		grid.gridwidth = 1;
-		
+
 		initializeBoard(g);//also draws board
 		pack();
 	}
@@ -116,16 +116,16 @@ public class Chess extends JFrame {
 				label[y][x].addMouseListener(new MouseListener() {
 					@Override
 					public void mousePressed(MouseEvent arg0) {
-						if(g.turn == p.playerColor) {
+						if(g.turn.equals(p)) {
 							if(selectedTile == null) {
 								if(g.board[y][x].getPiece() != null) {
 									if(g.board[y][x].getPiece().getColor() == p.playerColor) {
 										selectedTile = g.board[y][x];
 										label[y][x].setBorder(selectedBorder);
-										
+
 										for(Move m : g.getLegalMove(selectedTile)) {
 											legalMoveList.add(m);
-											label[m.y2][m.x2].setBorder(legalMoveBorder);
+											label[m.toTile.y][m.toTile.x].setBorder(legalMoveBorder);
 										}
 									}
 								}
@@ -136,15 +136,13 @@ public class Chess extends JFrame {
 								selectedTile = null;
 							}
 							else {
-								//TODO: legal checks against game before sending
-								g.board[y][x].addPiece(selectedTile.getPiece());
-								selectedTile.addPiece(null);
-								label[y][x].setIcon(g.board[y][x].getIcon());
-								label[selectedTile.getY()][selectedTile.getX()].setIcon(selectedTile.getIcon());
-								label[selectedTile.getY()][selectedTile.getX()].setBorder(nullBorder);
-								selectedTile = null;
-								clearLegalMoves();
-								self.send(g);
+								Move m = new Move(selectedTile, g.board[y][x]);
+								if(g.applyMove(m)) {
+									self.send(m);
+									label[selectedTile.y][selectedTile.x].setBorder(nullBorder);
+									selectedTile = null;
+									clearLegalMoves();
+								}
 							}
 						}
 					}
@@ -173,7 +171,7 @@ public class Chess extends JFrame {
 	}
 
 	public void drawBoard(Tile[][] board) {
-		currentTurnLabel.setText("Current Move: " + g.turn.toReadableString());
+		currentTurnLabel.setText("Current Move: " + g.turn.playerColor.toReadableString());
 		for(int i = 0;i<8;i++) {
 			for(int j = 0;j<8;j++) {
 				label[i][j].setIcon(board[i][j].getIcon());
@@ -245,15 +243,13 @@ public class Chess extends JFrame {
 			}
 			return null;
 		}
-
-		public void send(Game game) {
+		public void send(Move move) {
 			try {
-				oos.writeObject(game);
+				oos.writeObject(move);
 			}
 			catch(IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-
 }

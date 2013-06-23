@@ -1,35 +1,35 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 
-public class Piece implements Serializable {
+public abstract class Piece implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private PieceColor color;
-	private PieceType type;
-	private PieceType originalType;//necessary for pawns (bughouse)
+	private Player owner;
+	protected Piece originalType = null;//necessary for pawns (bughouse)
+	protected Tile loc = null;
+	protected int numOfMovesMade = 0;
+	protected int lastTurnMoved = -1; 
 
-	public Piece(PieceType t) {
-		type = t;
-		originalType = t;
+	public Piece() {}
+	public Piece(Player owner) {
+		this.owner = owner;
 	}
-	public Piece(Piece p, PieceColor c) {
-		type = p.getType();
-		originalType = p.getType();
-		color = c;
-	}
-	public Piece(PieceType pt, PieceColor c) {
-		type = pt;
-		originalType = pt;
-		color = c;
-	}
-	
 	public PieceColor getColor() {
-		return color;
+		return owner.playerColor;
 	}
-	public PieceType getType() {
-		return type;
-	}
-	public PieceType getOriginalType() {
+	public Piece getOriginalType() {
 		return originalType;
 	}
-
+	public Player getOwner() {
+		return owner;
+	}
+	public int getX() {
+		return loc.x;
+	}
+	public int getY() {
+		return loc.y;
+	}
+	public abstract String getTileCode();
+	
+	public abstract ArrayList<Move> getLegalMoves(Game g, boolean ignoreCheck);
 }

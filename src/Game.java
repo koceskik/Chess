@@ -4,89 +4,146 @@ import java.util.ArrayList;
 public class Game implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public Tile[][] board = new Tile[8][8];
-	public PieceColor turn = PieceColor.W;
-	
 	public Player pW = new Player(PieceColor.W);
 	public Player pB = new Player(PieceColor.B);
 
+	public Tile[][] board = new Tile[8][8];
+	public Player turn = pW;
+	public int turnCount = 0;
+
 	public Game() {
-		PieceType[] backRowOrder = {PieceType.R, PieceType.N, PieceType.B, PieceType.Q, PieceType.K, PieceType.B, PieceType.N, PieceType.R}; 
-		PieceColor c = PieceColor.B;
+		Player p = pB;
 		for(int i = 0;i<8;i++) {
-			if(i > 2) c = PieceColor.W;
+			if(i > 2) p = pW;
 			for(int j = 0;j<8;j++) {
 				board[i][j] = new Tile(j,i);
 				if(i == 0 || i == 7) {
-					board[i][j].addPiece(new Piece(backRowOrder[j], c));
+					board[i][j].addPiece(p.pieceList.get(j));
 				}
 				else if(i == 1 || i == 6) {
-					board[i][j].addPiece(new Piece(PieceType.P, c));
+					board[i][j].addPiece(p.pieceList.get(8+j));
 				}
 			}
 		}
 	}
-
-	public String toString() {
+	public String toReadableString() {
 		String returner = "";
 		for(int i = 0;i<8;i++) {
 			for(int j = 0;j<8;j++) {
-				if(board[i][j] == null) returner += " ";
-				else returner += board[i][j].toString();
+				if(board[i][j].getPiece() == null) returner += " ";
+				else returner += board[i][j].getPiece().getTileCode();
 			}
 			returner +="\n";
 		}
 		return returner;
 	}
-
-	@SuppressWarnings("unused")
-	private boolean inCheck() {//TODO: add actual logic here
-		return false;
+	public Player getOpponent() {
+		if(turn == pW) return pB;
+		else return pW;
 	}
 
-	public ArrayList<Move> getLegalMove(Tile t) {//returns a list of all legal moves, or empty if no legal moves
-		ArrayList<Move> moveList = new ArrayList<Move>();
-		if(t.getPiece() == null) return moveList;
-		if(t.getPiece().getColor() != turn) return moveList;
-		int x = t.getX();
-		int y = t.getY();
+	public boolean applyMove(Move m) {//returns true if applied
+		m.fromTile = board[m.fromTile.y][m.fromTile.x];//dereference from the Game, necessary for server 
+		m.toTile = board[m.toTile.y][m.toTile.x];
+		if(m.fromTile.getPiece() instanceof Pawn && board[m.toTile.y][m.toTile.x].getPiece() == null) {
+			if(m.fromTile.x != m.toTile.x) m.moveType = Move.EN_PASSANT;
+		}
+		if(m.fromTile.getPiece() instanceof King && Math.abs(m.toTile.x-m.fromTile.x) == 2) {
+			m.moveType = Move.CASTLE;
+		}
+		ArrayList<Move> legalMoveList = getLegalMove(m.fromTile);
+		boolean mInLegalMoveList = false;
+		for(Move lm : legalMoveList) {//legalMoveList.contains(m) doesn't seem to work
+			if(lm.equals(m)) {
+				mInLegalMoveList = true;
+			}
+		}
+		if(mInLegalMoveList) {
+			if(m.moveType == Move.EN_PASSANT) {
+				Piece enPassantPawn = board[m.fromTile.y][m.toTile.x].getPiece();
+				getOpponent().pieceList.remove(enPassantPawn);
+				getOpponent().deadPieces.add(enPassantPawn);
+				board[m.fromTile.y][m.toTile.x].addPiece(null);
+			}
+			if(m.moveType == Move.CASTLE) {
+				if(m.toTile.x - m.fromTile.x > 0) {
+					board[m.toTile.y][m.toTile.x-1].addPiece(board[m.toTile.y][m.toTile.x+1].getPiece());
+					board[m.toTile.y][m.toTile.x+1].addPiece(null);
+				}
+				else {
+					board[m.toTile.y][m.toTile.x+1].addPiece(board[m.toTile.y][m.toTile.x-2].getPiece());
+					board[m.toTile.y][m.toTile.x-2].addPiece(null);
+				}
+			}
+			m.toTile.addPiece(m.fromTile.getPiece());
+			m.fromTile.addPiece(null);
 
-		if(t.getPiece().getType() == PieceType.P) {
-			int dirOfMovement;
-			int specialPos;//location of double move
-			if(turn == PieceColor.W) {
-				dirOfMovement = -1;
-				specialPos = 6;
-			}
-			else {
-				dirOfMovement = 1;
-				specialPos = 1;
-			}
-			if(y+dirOfMovement >= 0 && y+dirOfMovement < 8) {
-				if(board[y+dirOfMovement][x].getPiece() == null) {
-					moveList.add(new Move(x,y,x,y+dirOfMovement));
-					if(y == specialPos && board[y+2*dirOfMovement][x].getPiece() == null) {
-						moveList.add(new Move(x,y,x,y+2*dirOfMovement));
-					}
-				}
-				if(x >= 1) {
-					if(board[y+dirOfMovement][x-1].getPiece() != null) {
-						if(board[y+dirOfMovement][x-1].getPiece().getColor() == turn.getOpponent()) {
-							moveList.add(new Move(x,y,x-1,y+dirOfMovement));
-						}
-					}
-				}
-				if(x <= 6) {
-					if(board[y+dirOfMovement][x+1].getPiece() != null) {
-						if(board[y+dirOfMovement][x+1].getPiece().getColor() == turn.getOpponent()) {
-							moveList.add(new Move(x,y,x+1,y+dirOfMovement));
-						}
-					}
+			m.toTile.getPiece().lastTurnMoved = turnCount;
+			m.toTile.getPiece().numOfMovesMade++;
+			turnCount++;
+			turn = getOpponent();
+			return true;
+		}
+		return false;
+	}
+	public boolean leavesPlayerInCheck(Move m) {//returns true if move leaves the user in check
+		m.fromTile = board[m.fromTile.y][m.fromTile.x];//dereference from the Game, necessary for server
+		m.toTile = board[m.toTile.y][m.toTile.x];
+		Piece fromTilePiece = m.fromTile.getPiece();
+		Piece toTilePiece = m.toTile.getPiece();
+		Piece enPassantPawn = board[m.fromTile.y][m.toTile.x].getPiece();
+
+		//if(toTilePiece != null) {
+		//	getOpponent().pieceList.remove(toTilePiece);
+		//}
+		if(m.moveType == Move.EN_PASSANT) {
+			getOpponent().pieceList.remove(enPassantPawn);
+			getOpponent().deadPieces.add(enPassantPawn);
+		}
+
+		board[m.toTile.y][m.toTile.x].addPiece(fromTilePiece);
+		board[m.fromTile.y][m.fromTile.x].addPiece(null);
+
+		boolean inCheck = inCheck();
+
+		board[m.toTile.y][m.toTile.x].addPiece(toTilePiece);
+		board[m.fromTile.y][m.fromTile.x].addPiece(fromTilePiece);
+
+		if(m.moveType == Move.EN_PASSANT) {
+			getOpponent().pieceList.add(enPassantPawn);
+			getOpponent().deadPieces.remove(enPassantPawn);
+		}
+		if(toTilePiece != null) {
+			getOpponent().pieceList.add(toTilePiece);
+			getOpponent().deadPieces.remove(toTilePiece);
+		}
+
+		return inCheck;
+	}
+
+	private boolean inCheck() {
+		Player currentPlayer = turn;
+		Player opp = this.getOpponent();
+
+		turn = opp;//needed for testing other player
+		boolean inCheck = false;
+		for(Piece p : opp.pieceList) {
+			for(Move m : p.getLegalMoves(this, true)) {
+				if(m.toTile == currentPlayer.king.loc) {
+					inCheck = true;
 				}
 			}
 		}
+		turn = currentPlayer;
+		return inCheck;
+	}
 
+	public ArrayList<Move> getLegalMove(Tile t) {//returns a list of all legal moves, or empty if no legal moves
+		t = board[t.y][t.x];//dereference from the Game, necessary for server
+		ArrayList<Move> moveList = new ArrayList<Move>();
+		if(t.getPiece() == null) return moveList;
+		if(t.getPiece().getOwner() != turn) return moveList;
 
-		return moveList;
+		return t.getPiece().getLegalMoves(this, false);
 	}
 }
