@@ -46,6 +46,16 @@ public class Game implements Serializable {
 		if(turn == pW) return pB;
 		else return pW;
 	}
+	public Player getPlayer(PieceColor pc) {
+		Player player;
+		if(pc == PieceColor.W) {
+			player = pW;
+		}
+		else {
+			player = pB;
+		}
+		return player;
+	}
 
 	public boolean applyMove(Move m) {//returns true if applied
 		if(!m.player.equals(turn)) return false;
