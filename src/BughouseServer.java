@@ -58,12 +58,7 @@ public class BughouseServer extends Thread {
 		for(int i = 0;i<PLAYER_TOTAL;i++) {
 			ClientHandler ch = playerList.get(i);
 			Game clientGame = null;
-			if(i < 2) {
-				clientGame = g.get(0);
-			}
-			else {
-				clientGame = g.get(1);
-			}
+			clientGame = g.get(i/2);
 			if(i % 2 == 0) {
 				clientGame.pW.gameCount++;
 				ch.send(clientGame.pW);
@@ -109,10 +104,20 @@ public class BughouseServer extends Thread {
 				try {
 					while(true) {
 						Move move = (Move) ois.readObject();
-						g.get(move.player.gameID).applyMove(move);//handles legal checks
+						boolean validMove = g.get(move.player.gameID).applyMove(move);//handles legal checks
 						
-						for(Piece p : g.get(move.player.gameID).turn.deadPieces) {
-							//TODO: logic for getting the opponent's partner
+						if(validMove) {
+							g.get(move.player.gameID).pW.pickupQueue();
+							g.get(move.player.gameID).pB.pickupQueue();
+	
+							int otherGameID = (move.player.gameID+1) % 2;
+							PieceColor pc = move.player.color;
+							Player receivingPiecePlayer = g.get(otherGameID).getPlayer(pc);
+							for(Piece p : g.get(move.player.gameID).turn.deadPieces) {//this should be only one item but whatever
+								receivingPiecePlayer.queuingPieces.add(p);
+							}
+							//Note: after applying the move, it is now the other player's turn
+							g.get(move.player.gameID).turn.deadPieces.clear();
 						}
 
 						for(ClientHandler ch : playerList) {
