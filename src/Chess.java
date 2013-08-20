@@ -19,6 +19,7 @@ public class Chess extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int port = 3355;
 	private static String serverIP = "127.0.0.1";
+	private static final String initialIP = "127.0.0.1";
 	private static volatile ClientHandler self = null;
 
 	private GridBagConstraints grid = new GridBagConstraints();
@@ -82,7 +83,7 @@ public class Chess extends JFrame {
 		joinGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(ipAddress.getText().equals("")) {
-					ipAddress.setText("127.0.0.1");
+					ipAddress.setText(initialIP);
 				}
 				serverIP = ipAddress.getText();
 				startGame();
@@ -90,7 +91,7 @@ public class Chess extends JFrame {
 		});
 
 		ipAddress = new JTextField(10);
-		ipAddress.setText("127.0.0.1");
+		ipAddress.setText(initialIP);
 		grid.gridy++;
 		mainScreen.add(ipAddress,grid);
 	}
