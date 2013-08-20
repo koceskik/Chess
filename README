@@ -1,0 +1,7 @@
+Java Networked (sockets) Chess program. Provides 1-vs-1 chess matches 
+(random piece assignment) and bughouse (2-vs-2) chess (random piece and 
+partner assignment).
+
+Note: bughouse is currently nonfunctional. As is, there are just 2 
+boards being played at the same time (ie pieces are not passed between 
+boards yet).
