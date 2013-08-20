@@ -13,6 +13,8 @@ public class Player implements Serializable {
 	public Piece king = null;
 	public UUID id = UUID.randomUUID();
 	public int gameID;
+	
+	// This is incremented during bughouse games to denote that there's another board to the client 
 	public int gameCount = 0;//technically the number of games is this value+1
 
 	public Player(PieceColor pc) {
@@ -37,5 +39,13 @@ public class Player implements Serializable {
 
 	public boolean equals(Player p) {
 		return id.equals(p.id);
+	}
+	
+	public void pickupQueue() {
+		//TODO: does this need a lock?
+		for(Piece p : queuingPieces) {
+			heldPieces.add(p);
+		}
+		queuingPieces.clear();
 	}
 }
