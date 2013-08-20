@@ -93,7 +93,9 @@ public class Game implements Serializable {
 				}
 			}
 			getOpponent().pieceList.remove(m.toTile.getPiece());
-			getOpponent().deadPieces.add(m.toTile.getPiece());
+			if(m.toTile.getPiece() != null) {
+				getOpponent().deadPieces.add(m.toTile.getPiece());
+			}
 
 			m.toTile.addPiece(m.fromTile.getPiece());
 			m.fromTile.addPiece(null);

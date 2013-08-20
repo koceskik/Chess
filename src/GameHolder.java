@@ -43,7 +43,8 @@ public class GameHolder {
 	private JLabel[] xAxisLabel = new JLabel[8];
 	private JLabel[] yAxisLabel = new JLabel[8];
 	private JLabel[][] label = new JLabel[8][8];
-	private JLabel[] heldPieces = new JLabel[16];
+	//private JLabel[] heldPieces = new JLabel[30];
+	private ArrayList<JLabel> heldPieces = new ArrayList<JLabel>();
 	private JPanel heldPiecesPanel = new JPanel();
 	private JScrollPane heldPiecesScrollPane = new JScrollPane(heldPiecesPanel);
 	
@@ -94,12 +95,14 @@ public class GameHolder {
 		grid.gridy = 0;
 		boardPanel.add(promotionList, grid);
 		
-		for(int i = 0;i<16;i++) {
-			heldPieces[i] = new JLabel();
+		for(int i = 0;i<30;i++) {//30 is the maximum number of held pieces: 16P, 4N, 4B, 4R, 2Q
+			JLabel newHeldPiece = new JLabel();
+			heldPieces.add(newHeldPiece);
+			heldPiecesPanel.add(newHeldPiece);
 		}
 		grid.gridx = 1;
 		grid.gridy = 11;
-		grid.gridwidth = 8;
+		grid.gridwidth = 9;
 		boardPanel.add(heldPiecesScrollPane, grid);
 
 		grid.gridwidth = 1;
@@ -170,11 +173,13 @@ public class GameHolder {
 		else {
 			player = g.pB;
 		}
+		System.out.println(pc + " held: " + player.heldPieces.size());
 		for(int i = 0;i<player.heldPieces.size();i++) {
-			heldPieces[i].setIcon(Tile.getHeldIcon(player.heldPieces.get(i), true));
+			heldPieces.get(i).setIcon(Tile.getHeldIcon(player.heldPieces.get(i), true));
 		}
+		System.out.println(pc + " queuing: " + player.queuingPieces.size());
 		for(int i = 0;i<player.queuingPieces.size();i++) {
-			heldPieces[player.heldPieces.size()+i].setIcon(Tile.getHeldIcon(player.queuingPieces.get(i), false));
+			heldPieces.get(player.heldPieces.size()+i).setIcon(Tile.getHeldIcon(player.queuingPieces.get(i), false));
 		}
 	}
 	

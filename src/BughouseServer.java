@@ -111,9 +111,10 @@ public class BughouseServer extends Thread {
 							g.get(move.player.gameID).pB.pickupQueue();
 	
 							int otherGameID = (move.player.gameID+1) % 2;
-							PieceColor pc = move.player.color;
+							PieceColor pc = move.player.color.getOpponent();
 							Player receivingPiecePlayer = g.get(otherGameID).getPlayer(pc);
-							for(Piece p : g.get(move.player.gameID).turn.deadPieces) {//this should be only one item but whatever
+							System.out.println(g.get(move.player.gameID).turn.color + " has dead pieces: " + g.get(move.player.gameID).turn.deadPieces.size());
+							for(Piece p : g.get(move.player.gameID).turn.deadPieces) {//this should be 0 or 1 but whatever
 								receivingPiecePlayer.queuingPieces.add(p);
 							}
 							//Note: after applying the move, it is now the other player's turn
@@ -126,6 +127,11 @@ public class BughouseServer extends Thread {
 							}
 							else {
 								ch.send(g.get(move.player.gameID));//only sends the game that was changed
+								//TODO: only send second board when a piece was taken
+								//TODO: just send g.get(0) and g.get(1) OR use smart sending for when a piece is taken 
+								//for update of other board receiving pieces
+								int otherGameID = (move.player.gameID+1) % 2;
+								ch.send(g.get(otherGameID));
 							}
 						}
 					}
