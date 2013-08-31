@@ -2,7 +2,7 @@ import java.io.Serializable;
 
 public class Move implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public static int NORMAL = 0;//TODO: enum
+	public static int NORMAL = 0;//TODO: enum? Maybe not since we do math on it
 	public static int EN_PASSANT = 1;
 	public static int CASTLE = 2;
 	public static int PROMOTE_QUEEN = 3;

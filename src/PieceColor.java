@@ -1,6 +1,5 @@
 public enum PieceColor {
-	W,
-	B;
+	W,B;
 	
 	public PieceColor getOpponent() {
 		if(this == W) return B;
