@@ -2,13 +2,13 @@ import java.io.Serializable;
 
 public class Move implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public static int NORMAL = 0;//TODO: enum? Maybe not since we do math on it
-	public static int EN_PASSANT = 1;
-	public static int CASTLE = 2;
-	public static int PROMOTE_QUEEN = 3;
-	public static int PROMOTE_KNIGHT = 4;
-	public static int PROMOTE_ROOK = 5;
-	public static int PROMOTE_BISHOP = 6;
+	public static final int NORMAL = 0;//TODO: enum? Maybe not since we do math on it
+	public static final int EN_PASSANT = 1;
+	public static final int CASTLE = 2;
+	public static final int PROMOTE_QUEEN = 3;
+	public static final int PROMOTE_KNIGHT = 4;
+	public static final int PROMOTE_ROOK = 5;
+	public static final int PROMOTE_BISHOP = 6;
 
 	public Tile fromTile;
 	public Tile toTile;
