@@ -208,6 +208,9 @@ public class Chess extends JFrame {
 					Game recGame = read();
 					if(recGame != null) {
 						g.get(recGame.id).updateGame(recGame);
+						if(recGame.getWinner() != null) {
+							doLoop = false;
+						}
 					}
 					else {
 						doLoop = false;

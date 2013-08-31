@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Game implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static int count = 0;
+	public static int count = 0;
 
 	public Player pW = null;
 	public Player pB = null;
@@ -12,6 +12,16 @@ public class Game implements Serializable {
 	public Player turn = null;
 	public int turnCount = 0;
 	public int id;
+	private Player winner = null;
+	public void setWinner(Player p) {
+		winner = p;
+	}
+	public void setWinner(PieceColor pc) {
+		winner = getPlayer(pc);
+	}
+	public Player getWinner() {
+		return winner;
+	}
 
 	public Game() {
 		this.id = count++;

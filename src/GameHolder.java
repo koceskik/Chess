@@ -1,5 +1,4 @@
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -51,7 +50,7 @@ public class GameHolder {
 	private JPanel heldPiecesPanel = new JPanel();
 	private JScrollPane heldPiecesScrollPane = new JScrollPane(heldPiecesPanel);
 	
-	public JLabel getLabel(int x, int y) {
+	private JLabel getLabel(int x, int y) {
 		if(pc == PieceColor.W) {
 			return label[y][x];
 		}
@@ -61,7 +60,7 @@ public class GameHolder {
 	}
 	
 	public Game g = null;
-	private PieceColor pc = null;//player's or partner's color
+	private PieceColor pc = null;//player's or partner's color (ie color of the bottom player)
 	
 	public GameHolder(Game g, PieceColor color, JPanel location, Chess.ClientHandler self, Dimension d) {
 		this.g = g;
@@ -134,7 +133,6 @@ public class GameHolder {
 				@Override
 				public void mouseReleased(MouseEvent arg0) {}
 			});
-			
 		}
 		heldPiecesPanel.setBorder(nullBorder);
 		heldPiecesPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -144,7 +142,10 @@ public class GameHolder {
 		grid.gridx = 1;
 		grid.gridy = 11;
 		grid.gridwidth = 8;
-		boardPanel.add(heldPiecesScrollPane, grid);
+		
+		if(this.g.pW.gameCount > 0) {
+			boardPanel.add(heldPiecesScrollPane, grid);
+		}
 		
 		heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));//TODO: create class HeldPiecesPanel extends JPanel implements Scrollable to set the preferred viewport size
 		heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -203,6 +204,18 @@ public class GameHolder {
 			whiteLabelPanel.setBorder(nullBorder);
 			blackLabelPanel.setBorder(selectedBorder);
 		}
+		//display who's turn it is
+		if(g.getWinner() != null) {
+			if(g.getWinner().color == PieceColor.W) {
+				whiteLabelPanel.setBorder(legalMoveBorder);
+				blackLabelPanel.setBorder(nullBorder);
+			}
+			else {
+				whiteLabelPanel.setBorder(nullBorder);
+				blackLabelPanel.setBorder(legalMoveBorder);
+			}
+		}
+		
 		//draws board
 		for(int i = 0;i<8;i++) {
 			for(int j = 0;j<8;j++) {

@@ -98,6 +98,13 @@ public class ChessServer extends Thread {
 					while(true) {
 						Move move = (Move) ois.readObject();
 						g.applyMove(move);//handles legal checks
+						int totalLegalMoves = 0;
+						for(Piece p : g.turn.pieceList) {
+							totalLegalMoves += p.getLegalMoves(g, false).size();
+						}
+						if(totalLegalMoves == 0) {
+							g.setWinner(g.getOpponent());
+						}
 
 						for(ClientHandler ch : playerList) {
 							if(ch == null) {
