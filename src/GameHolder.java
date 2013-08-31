@@ -146,10 +146,7 @@ public class GameHolder {
 		grid.gridwidth = 8;
 		boardPanel.add(heldPiecesScrollPane, grid);
 		
-		heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*d.height+1));//TODO: create class HeldPiecesPanel extends JPanel implements Scrollable to set the preferred viewport size
-		if(d.height > 16) {
-			heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, d.height));
-		}
+		heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));//TODO: create class HeldPiecesPanel extends JPanel implements Scrollable to set the preferred viewport size
 		heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		heldPiecesScrollPane.setBorder(nullBorder);
 		
