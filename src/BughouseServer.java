@@ -113,7 +113,6 @@ public class BughouseServer extends Thread {
 							int otherGameID = (move.player.gameID+1) % 2;
 							PieceColor pc = move.player.color.getOpponent();
 							Player receivingPiecePlayer = g.get(otherGameID).getPlayer(pc);
-							System.out.println(g.get(move.player.gameID).turn.color + " has dead pieces: " + g.get(move.player.gameID).turn.deadPieces.size());
 							for(Piece p : g.get(move.player.gameID).turn.deadPieces) {//this should be 0 or 1 but whatever
 								receivingPiecePlayer.queuingPieces.add(p);
 							}
@@ -126,12 +125,14 @@ public class BughouseServer extends Thread {
 								playerList.remove(ch);
 							}
 							else {
-								ch.send(g.get(move.player.gameID));//only sends the game that was changed
-								//TODO: only send second board when a piece was taken
-								//TODO: just send g.get(0) and g.get(1) OR use smart sending for when a piece is taken 
-								//for update of other board receiving pieces
+								ch.send(g.get(0));//send both games, because a piece might have been added to the queue on the other board
+								ch.send(g.get(1));
+								/*
+								ch.send(g.get(move.player.gameID));//only sends the game that was changed 
 								int otherGameID = (move.player.gameID+1) % 2;
 								ch.send(g.get(otherGameID));
+								*/
+								//TODO: think about smart sending for when a piece is taken
 							}
 						}
 					}

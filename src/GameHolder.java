@@ -1,5 +1,7 @@
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
@@ -11,6 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 
 public class GameHolder {
@@ -23,6 +26,7 @@ public class GameHolder {
 	public static final Border legalMoveBorder = BorderFactory.createLineBorder(Color.blue);
 	public static final Border nullBorder = BorderFactory.createEmptyBorder();
 	private Tile selectedTile = null;
+	private Integer selectedHeldPieceNum = null;
 	private ArrayList<Move> legalMoveList = new ArrayList<Move>();
 	private void clearLegalMoves() {
 		for(Move m : legalMoveList) {
@@ -43,7 +47,6 @@ public class GameHolder {
 	private JLabel[] xAxisLabel = new JLabel[8];
 	private JLabel[] yAxisLabel = new JLabel[8];
 	private JLabel[][] label = new JLabel[8][8];
-	//private JLabel[] heldPieces = new JLabel[30];
 	private ArrayList<JLabel> heldPieces = new ArrayList<JLabel>();
 	private JPanel heldPiecesPanel = new JPanel();
 	private JScrollPane heldPiecesScrollPane = new JScrollPane(heldPiecesPanel);
@@ -99,12 +102,57 @@ public class GameHolder {
 			JLabel newHeldPiece = new JLabel();
 			heldPieces.add(newHeldPiece);
 			heldPiecesPanel.add(newHeldPiece);
+			
+			final int x = i;
+			final Player player = g.getPlayer(this.pc);
+			heldPieces.get(i).addMouseListener(new MouseListener() {
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					if(g.turn.equals(player)) {
+						if(selectedHeldPieceNum == null) {
+							selectedHeldPieceNum = x;
+							heldPieces.get(x).setBorder(selectedBorder);
+							
+							/*for(Move m : g.getLegalMove(selectedTile)) {
+								legalMoveList.add(m);
+								getLabel(m.toTile.x, m.toTile.y).setBorder(legalMoveBorder);
+							}*/
+						}
+						else if(selectedHeldPieceNum == x) {
+							clearLegalMoves();
+							heldPieces.get(x).setBorder(nullBorder);
+							selectedHeldPieceNum = null;
+						}
+					}
+				}
+				@Override
+				public void mouseClicked(MouseEvent arg0) {}
+				@Override
+				public void mouseEntered(MouseEvent arg0) {}
+				@Override
+				public void mouseExited(MouseEvent arg0) {}
+				@Override
+				public void mouseReleased(MouseEvent arg0) {}
+			});
+			
 		}
+		heldPiecesPanel.setBorder(nullBorder);
+		heldPiecesPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		((FlowLayout) heldPiecesPanel.getLayout()).setVgap(0);
+		((FlowLayout) heldPiecesPanel.getLayout()).setHgap(0);
+		
 		grid.gridx = 1;
 		grid.gridy = 11;
-		grid.gridwidth = 9;
+		grid.gridwidth = 8;
 		boardPanel.add(heldPiecesScrollPane, grid);
-
+		
+		heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*d.height+1));//TODO: create class HeldPiecesPanel extends JPanel implements Scrollable to set the preferred viewport size
+		if(d.height > 16) {
+			heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, d.height));
+		}
+		heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		heldPiecesScrollPane.setBorder(nullBorder);
+		
 		grid.gridwidth = 1;
 		initBoard();
 	}
@@ -173,14 +221,13 @@ public class GameHolder {
 		else {
 			player = g.pB;
 		}
-		System.out.println(pc + " held: " + player.heldPieces.size());
 		for(int i = 0;i<player.heldPieces.size();i++) {
 			heldPieces.get(i).setIcon(Tile.getHeldIcon(player.heldPieces.get(i), true));
 		}
-		System.out.println(pc + " queuing: " + player.queuingPieces.size());
 		for(int i = 0;i<player.queuingPieces.size();i++) {
 			heldPieces.get(player.heldPieces.size()+i).setIcon(Tile.getHeldIcon(player.queuingPieces.get(i), false));
 		}
+		heldPiecesScrollPane.revalidate();
 	}
 	
 	public void initLabelClicks(final Player p) {
