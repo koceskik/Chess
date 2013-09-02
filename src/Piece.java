@@ -7,7 +7,7 @@ public abstract class Piece implements Serializable {
 	private Player owner;
 	protected Piece originalType = null;//necessary for pawns (bughouse)
 	protected Tile loc = null;
-	protected int numOfMovesMade = 0;
+	protected int numOfMovesMade = 0;//necessary for pawn en passant only if the piece moved 2 spaces in first turn
 	protected int lastTurnMoved = -1;
 
 	public Piece() {}
