@@ -239,11 +239,12 @@ public class GameHolder {
 								selectedTile = null;
 							}
 							else {
-								Move m = new Move(selectedTile, g.board[y][x], p);
+								Move m = new Move(selectedTile.getPiece(), g.board[y][x], p);
 								if(selectedTile.getPiece() instanceof Pawn && (y == 0 || y == 7)) {
 									m.moveType = Move.PROMOTE_QUEEN + promotionList.getSelectedIndex();
 								}
-								if(g.applyMove(m)) {
+								//if(g.applyMove(m)) {
+								if(g.isLegalMove(m)) {
 									self.send(m);
 									getLabel(selectedTile.x,selectedTile.y).setBorder(nullBorder);
 									selectedTile = null;

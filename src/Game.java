@@ -66,19 +66,40 @@ public class Game implements Serializable {
 		}
 		return player;
 	}
+	
+	public boolean isLegalMove(Move m) {
+		if(!m.player.equals(turn)) return false;
+		
+		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
+		m.toTile = board[m.toTile.y][m.toTile.x];
+		if(m.piece instanceof Pawn && m.toTile.getPiece() == null) {
+			if(m.piece.getX() != m.toTile.x) m.moveType = Move.EN_PASSANT;
+		}
+		else if(m.piece instanceof King && Math.abs(m.toTile.x-m.piece.getX()) == 2) {
+			m.moveType = Move.CASTLE;
+		}
+		ArrayList<Move> legalMoveList = m.piece.getLegalMoves(this, false);
+		boolean mInLegalMoveList = false;
+		for(Move lm : legalMoveList) {//legalMoveList.contains(m) doesn't seem to work
+			if(lm.equals(m)) {
+				mInLegalMoveList = true;
+			}
+		}
+		return mInLegalMoveList;
+	}
 
 	public boolean applyMove(Move m) {//returns true if applied
 		if(!m.player.equals(turn)) return false;
 
-		m.fromTile = board[m.fromTile.y][m.fromTile.x];//dereference from the Game, necessary for server
+		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
 		m.toTile = board[m.toTile.y][m.toTile.x];
-		if(m.fromTile.getPiece() instanceof Pawn && board[m.toTile.y][m.toTile.x].getPiece() == null) {
-			if(m.fromTile.x != m.toTile.x) m.moveType = Move.EN_PASSANT;
+		if(m.piece instanceof Pawn && m.toTile.getPiece() == null) {
+			if(m.piece.getX() != m.toTile.x) m.moveType = Move.EN_PASSANT;
 		}
-		if(m.fromTile.getPiece() instanceof King && Math.abs(m.toTile.x-m.fromTile.x) == 2) {
+		else if(m.piece instanceof King && Math.abs(m.toTile.x-m.piece.getX()) == 2) {
 			m.moveType = Move.CASTLE;
 		}
-		ArrayList<Move> legalMoveList = getLegalMove(m.fromTile);
+		ArrayList<Move> legalMoveList = m.piece.getLegalMoves(this, false);
 		boolean mInLegalMoveList = false;
 		for(Move lm : legalMoveList) {//legalMoveList.contains(m) doesn't seem to work
 			if(lm.equals(m)) {
@@ -87,13 +108,13 @@ public class Game implements Serializable {
 		}
 		if(mInLegalMoveList) {
 			if(m.moveType == Move.EN_PASSANT) {
-				Piece enPassantPawn = board[m.fromTile.y][m.toTile.x].getPiece();
+				Piece enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
 				getOpponent().pieceList.remove(enPassantPawn);
 				getOpponent().deadPieces.add(enPassantPawn);
-				board[m.fromTile.y][m.toTile.x].addPiece(null);
+				board[m.piece.getY()][m.toTile.x].addPiece(null);
 			}
 			if(m.moveType == Move.CASTLE) {
-				if(m.toTile.x - m.fromTile.x > 0) {
+				if(m.toTile.x - m.piece.getX() > 0) {
 					board[m.toTile.y][m.toTile.x-1].addPiece(board[m.toTile.y][m.toTile.x+1].getPiece());
 					board[m.toTile.y][m.toTile.x+1].addPiece(null);
 				}
@@ -107,8 +128,8 @@ public class Game implements Serializable {
 				getOpponent().deadPieces.add(m.toTile.getPiece());
 			}
 
-			m.toTile.addPiece(m.fromTile.getPiece());
-			m.fromTile.addPiece(null);
+			m.piece.loc.addPiece(null);//order matters
+			m.toTile.addPiece(m.piece);
 
 			if(m.toTile.getPiece() instanceof Pawn) {
 				Piece promotion = null;
@@ -141,11 +162,13 @@ public class Game implements Serializable {
 		return false;
 	}
 	public boolean leavesPlayerInCheck(Move m) {//returns true if move leaves the user in check
-		m.fromTile = board[m.fromTile.y][m.fromTile.x];//dereference from the Game, necessary for server
+		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
 		m.toTile = board[m.toTile.y][m.toTile.x];
-		Piece fromTilePiece = m.fromTile.getPiece();
+		Piece fromTilePiece = m.piece;
 		Piece toTilePiece = m.toTile.getPiece();
-		Piece enPassantPawn = board[m.fromTile.y][m.toTile.x].getPiece();
+		Piece enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
+		int fromX = m.piece.getX();//necessary because after moving the fromPiece, there's no other reference to its original location
+		int fromY = m.piece.getY();
 
 		if(toTilePiece != null) {
 			getOpponent().pieceList.remove(toTilePiece);
@@ -156,13 +179,13 @@ public class Game implements Serializable {
 			getOpponent().deadPieces.add(enPassantPawn);
 		}
 
-		board[m.toTile.y][m.toTile.x].addPiece(fromTilePiece);
-		board[m.fromTile.y][m.fromTile.x].addPiece(null);
+		m.piece.loc.addPiece(null);//order matters
+		m.toTile.addPiece(fromTilePiece);
 
 		boolean inCheck = inCheck();
 
-		board[m.toTile.y][m.toTile.x].addPiece(toTilePiece);
-		board[m.fromTile.y][m.fromTile.x].addPiece(fromTilePiece);
+		m.toTile.addPiece(toTilePiece);
+		board[fromY][fromX].addPiece(fromTilePiece);
 
 		if(m.moveType == Move.EN_PASSANT) {
 			getOpponent().pieceList.add(enPassantPawn);

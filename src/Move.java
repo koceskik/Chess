@@ -11,36 +11,31 @@ public class Move implements Serializable {
 	public static final int PROMOTE_BISHOP = 6;
 	public static final int PLACEMENT = 7;
 
-	public Piece movingPiece;
-	public Tile fromTile;
+	public Piece piece;
 	public Tile toTile;
 	public int moveType;
 	public Player player = null;
 	public Move(Tile fromTile, Tile toTile) {
-		this.fromTile = fromTile;
 		this.toTile = toTile;
 		this.moveType = NORMAL;
 	}
 	public Move(Tile fromTile, Tile toTile, Player p) {
-		this.fromTile = fromTile;
 		this.toTile = toTile;
 		this.moveType = NORMAL;
 		this.player = p;
 	}
 	public Move(Piece piece, Tile toTile) {
-		movingPiece = piece;
-		this.fromTile = piece.loc;
+		this.piece = piece;
 		this.toTile = toTile;
 		this.moveType = PLACEMENT;
 	}
 	public Move(Piece piece, Tile toTile, Player p) {
-		movingPiece = piece;
-		this.fromTile = piece.loc;
+		this.piece = piece;
 		this.toTile = toTile;
 		this.moveType = PLACEMENT;
 		this.player = p;
 	}
 	public boolean equals(Move m) {
-		return fromTile.equals(m.fromTile) && toTile.equals(m.toTile);//TODO: will this need to be changed to account for movingPiece
+		return piece.equals(m.piece) && toTile.equals(m.toTile);//TODO: will this need to be changed to account for movingPiece
 	}
 }
