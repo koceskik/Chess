@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Game implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public static int count = 0;
+	public static int count = 0;//Note: this is only "seen" on the computer hosting the server. Other clients don't get Game's static variables
 
 	public Player pW = null;
 	public Player pB = null;
