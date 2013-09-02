@@ -2,18 +2,21 @@ import java.io.Serializable;
 
 public class Move implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public static final int NORMAL = 0;//TODO: enum? Maybe not since we do math on it
-	public static final int EN_PASSANT = 1;
-	public static final int CASTLE = 2;
-	public static final int PROMOTE_QUEEN = 3;
-	public static final int PROMOTE_KNIGHT = 4;
-	public static final int PROMOTE_ROOK = 5;
-	public static final int PROMOTE_BISHOP = 6;
-	public static final int PLACEMENT = 7;
+	public enum MoveType {
+		NORMAL, EN_PASSANT, CASTLE, PROMOTE_QUEEN, PROMOTE_KNIGHT, PROMOTE_ROOK, PROMOTE_BISHOP, PLACEMENT;
+		public static MoveType getPromotionType(int promotionIndex) {
+			if(promotionIndex == 0) return PROMOTE_QUEEN;
+			else if(promotionIndex == 1) return PROMOTE_KNIGHT;
+			else if(promotionIndex == 2) return PROMOTE_ROOK;
+			else if(promotionIndex == 3) return PROMOTE_BISHOP;
+			else return null;
+		}
+	}
 
 	public Piece piece;
 	public Tile toTile;
-	public int moveType = NORMAL;
+	//public int moveType = NORMAL;
+	public MoveType moveType = MoveType.NORMAL;
 	public Player player = null;
 	public Move(Piece piece, Tile toTile) {
 		this.piece = piece;

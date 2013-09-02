@@ -241,7 +241,7 @@ public class GameHolder {
 							else {
 								Move m = new Move(selectedTile.getPiece(), g.board[y][x], p);
 								if(selectedTile.getPiece() instanceof Pawn && (y == 0 || y == 7)) {
-									m.moveType = Move.PROMOTE_QUEEN + promotionList.getSelectedIndex();
+									m.moveType = Move.MoveType.getPromotionType(promotionList.getSelectedIndex());
 								}
 								//if(g.applyMove(m)) {
 								if(g.isLegalMove(m)) {
