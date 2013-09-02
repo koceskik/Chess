@@ -11,6 +11,23 @@ public class Move implements Serializable {
 			else if(promotionIndex == 3) return PROMOTE_BISHOP;
 			else return null;
 		}
+		
+		public static Piece getPromotion(MoveType moveType, Player owner) {
+			Piece promotion = null;
+			if(moveType == Move.MoveType.PROMOTE_QUEEN) {
+				promotion = new Queen(owner);
+			}
+			else if(moveType == Move.MoveType.PROMOTE_KNIGHT) {
+				promotion = new Knight(owner);
+			}
+			else if(moveType == Move.MoveType.PROMOTE_ROOK) {
+				promotion = new Rook(owner);
+			}
+			else if(moveType == Move.MoveType.PROMOTE_BISHOP) {
+				promotion = new Bishop(owner);
+			}
+			return promotion;
+		}
 	}
 
 	public Piece piece;

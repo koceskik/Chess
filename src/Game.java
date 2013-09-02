@@ -132,19 +132,8 @@ public class Game implements Serializable {
 			m.toTile.addPiece(m.piece);
 
 			if(m.toTile.getPiece() instanceof Pawn) {
-				Piece promotion = null;
-				if(m.moveType == Move.MoveType.PROMOTE_QUEEN) {
-					promotion = new Queen(turn);
-				}
-				else if(m.moveType == Move.MoveType.PROMOTE_KNIGHT) {
-					promotion = new Knight(turn);
-				}
-				else if(m.moveType == Move.MoveType.PROMOTE_ROOK) {
-					promotion = new Rook(turn);
-				}
-				else if(m.moveType == Move.MoveType.PROMOTE_BISHOP) {
-					promotion = new Bishop(turn);
-				}
+				Piece promotion = Move.MoveType.getPromotion(m.moveType, turn);
+				
 				if(promotion != null) {
 					promotion.originalType = new Pawn();
 					turn.pieceList.remove(m.toTile.getPiece());
@@ -202,7 +191,7 @@ public class Game implements Serializable {
 		Player currentPlayer = turn;
 		Player opp = this.getOpponent();
 
-		turn = opp;//needed for testing other player; yes its necessary (confirmed)
+		turn = opp;//needed for testing other player; yes its necessary (confirmed). MAYBE NOT SINCE I CHANGED HOW PIECES WORK
 		boolean inCheck = false;
 		for(Piece p : opp.pieceList) {
 			for(Move m : p.getLegalMoves(this, true)) {
