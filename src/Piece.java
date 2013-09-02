@@ -4,10 +4,10 @@ import java.util.ArrayList;
 public abstract class Piece implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private Player owner;
+	private Player owner;//TODO: this may need to be public and changed when the piece is taken and passed (bughouse)
 	protected Piece originalType = null;//necessary for pawns (bughouse)
 	protected Tile loc = null;
-	protected int numOfMovesMade = 0;//necessary for pawn en passant only if the piece moved 2 spaces in first turn
+	protected int numOfMovesMade = 0;//necessary for en passant only if the pawn moved 2 spaces in first turn
 	protected int lastTurnMoved = -1;
 
 	public Piece() {}
