@@ -101,38 +101,6 @@ public class GameHolder {
 			JLabel newHeldPiece = new JLabel();
 			heldPieces.add(newHeldPiece);
 			heldPiecesPanel.add(newHeldPiece);
-			
-			final int x = i;
-			final Player player = g.getPlayer(this.pc);
-			heldPieces.get(i).addMouseListener(new MouseListener() {
-				@Override
-				public void mousePressed(MouseEvent arg0) {
-					if(g.turn.equals(player)) {
-						if(selectedHeldPieceNum == null) {
-							selectedHeldPieceNum = x;
-							heldPieces.get(x).setBorder(selectedBorder);
-							
-							/*for(Move m : g.getLegalMove(selectedTile)) {
-								legalMoveList.add(m);
-								getLabel(m.toTile.x, m.toTile.y).setBorder(legalMoveBorder);
-							}*/
-						}
-						else if(selectedHeldPieceNum == x) {
-							clearLegalMoves();
-							heldPieces.get(x).setBorder(nullBorder);
-							selectedHeldPieceNum = null;
-						}
-					}
-				}
-				@Override
-				public void mouseClicked(MouseEvent arg0) {}
-				@Override
-				public void mouseEntered(MouseEvent arg0) {}
-				@Override
-				public void mouseExited(MouseEvent arg0) {}
-				@Override
-				public void mouseReleased(MouseEvent arg0) {}
-			});
 		}
 		heldPiecesPanel.setBorder(nullBorder);
 		heldPiecesPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -143,7 +111,7 @@ public class GameHolder {
 		grid.gridy = 11;
 		grid.gridwidth = 8;
 		
-		if(this.g.pW.gameCount > 0) {
+		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {
 			boardPanel.add(heldPiecesScrollPane, grid);
 		}
 		
@@ -206,7 +174,7 @@ public class GameHolder {
 			whiteLabelPanel.setBorder(nullBorder);
 			blackLabelPanel.setBorder(selectedBorder);
 		}
-		//display who's turn it is
+		//display a winner
 		if(g.getWinner() != null) {
 			if(g.getWinner().color == PieceColor.W) {
 				whiteLabelPanel.setBorder(legalMoveBorder);
@@ -243,6 +211,7 @@ public class GameHolder {
 	}
 	
 	public void initLabelClicks(final Player p) {
+		//for the Player's board
 		for(int i = 0;i<8;i++) {
 			for(int j = 0;j<8;j++) {
 				final int x = j;
@@ -294,5 +263,41 @@ public class GameHolder {
 				});
 			}
 		}
+		
+		//for the Player's held pieces
+		for(int i = 0;i<30;i++) {//30 is the maximum number of held pieces: 16P, 4N, 4B, 4R, 2Q
+			final int x = i;
+			heldPieces.get(i).addMouseListener(new MouseListener() {
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					if(g.turn.equals(p) && g.turn.heldPieces.size() > x) {
+						if(selectedHeldPieceNum == null) {
+							selectedHeldPieceNum = x;
+							heldPieces.get(x).setBorder(selectedBorder);
+							
+							/*for(Move m : g.getLegalMove(selectedTile)) {
+								legalMoveList.add(m);
+								getLabel(m.toTile.x, m.toTile.y).setBorder(legalMoveBorder);
+							}*/
+						}
+						else if(selectedHeldPieceNum == x) {
+							clearLegalMoves();
+							heldPieces.get(x).setBorder(nullBorder);
+							selectedHeldPieceNum = null;
+						}
+					}
+				}
+				@Override
+				public void mouseClicked(MouseEvent arg0) {}
+				@Override
+				public void mouseEntered(MouseEvent arg0) {}
+				@Override
+				public void mouseExited(MouseEvent arg0) {}
+				@Override
+				public void mouseReleased(MouseEvent arg0) {}
+			});
+		}
+		
+		
 	}
 }

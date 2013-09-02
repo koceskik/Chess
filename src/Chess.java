@@ -98,7 +98,7 @@ public class Chess extends JFrame {
 
 	public void startGame() {
 		connectToServer();//blocks until it receives Player and Game
-		for(GameHolder gh : g) {
+		for(GameHolder gh : g) {//used for generalization purposes, it could be done directly
 			if(p.gameID == gh.g.id) {
 				gh.initLabelClicks(p);
 			}
@@ -163,7 +163,6 @@ public class Chess extends JFrame {
 				else {
 					pc = p.color.getOpponent();
 					d = GameHolder.scaledDim;
-					
 				}
 				g.add(new GameHolder(game, pc, gameScreen, this, d));
 			}

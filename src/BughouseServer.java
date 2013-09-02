@@ -54,17 +54,19 @@ public class BughouseServer extends Thread {
 			}
 		}
 
+		g.get(0).pB.gameCount++;
+		g.get(0).pW.gameCount++;
+		g.get(1).pB.gameCount++;
+		g.get(1).pW.gameCount++;
 		Collections.shuffle(playerList);
 		for(int i = 0;i<PLAYER_TOTAL;i++) {
 			ClientHandler ch = playerList.get(i);
 			Game clientGame = null;
 			clientGame = g.get(i/2);
 			if(i % 2 == 0) {
-				clientGame.pW.gameCount++;
 				ch.send(clientGame.pW);
 			}
 			else {
-				clientGame.pB.gameCount++;
 				ch.send(clientGame.pB);
 			}
 			ch.send(g.get(0));
