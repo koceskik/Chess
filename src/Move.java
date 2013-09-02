@@ -15,15 +15,6 @@ public class Move implements Serializable {
 	public Tile toTile;
 	public int moveType;
 	public Player player = null;
-	public Move(Tile fromTile, Tile toTile) {
-		this.toTile = toTile;
-		this.moveType = NORMAL;
-	}
-	public Move(Tile fromTile, Tile toTile, Player p) {
-		this.toTile = toTile;
-		this.moveType = NORMAL;
-		this.player = p;
-	}
 	public Move(Piece piece, Tile toTile) {
 		this.piece = piece;
 		this.toTile = toTile;
