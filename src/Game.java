@@ -25,8 +25,11 @@ public class Game implements Serializable {
 
 	public Game() {
 		this.id = count++;
-		turn = pW = new Player(PieceColor.W, id);
+		pW = new Player(PieceColor.W, id);
 		pB = new Player(PieceColor.B, id);
+		pW.opponent = pB;
+		pB.opponent = pW;
+		turn = pW;
 		Player p = pB;
 		for(int i = 0;i<8;i++) {
 			if(i == 4) p = pW;
@@ -106,6 +109,7 @@ public class Game implements Serializable {
 				mInLegalMoveList = true;
 			}
 		}
+		
 		if(mInLegalMoveList) {
 			if(m.moveType == Move.MoveType.EN_PASSANT) {
 				Piece enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
@@ -146,16 +150,15 @@ public class Game implements Serializable {
 			m.toTile.getPiece().numOfMovesMade++;
 			turnCount++;
 			turn = getOpponent();
-			return true;
 		}
-		return false;
+		return mInLegalMoveList;
 	}
 	public boolean leavesPlayerInCheck(Move m) {//returns true if move leaves the user in check
 		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
 		m.toTile = board[m.toTile.y][m.toTile.x];
 		Piece toTilePiece = m.toTile.getPiece();
 		Piece enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
-		int fromX = m.piece.getX();//necessary because after moving the fromPiece, there's no other reference to its original location
+		int fromX = m.piece.getX();//necessary because after moving the m.piece, there's no other reference to its original location
 		int fromY = m.piece.getY();
 
 		if(toTilePiece != null) {

@@ -13,9 +13,11 @@ public class Player implements Serializable {
 	public Piece king = null;
 	public UUID id = UUID.randomUUID();
 	public int gameID;
+	public Player opponent = null;
+	public Player partner = null;
 	
 	// This is incremented during bughouse games to denote that there's another board to the client 
-	public int gameCount = 0;//technically the number of games is this value+1
+	public int gameCount = 0;//technically the number of games is this value+1. ISN'T THIS UNNECESSARY with the partner variable
 
 	public Player(PieceColor pc) {
 		this(pc, 0);

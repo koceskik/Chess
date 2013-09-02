@@ -6,7 +6,7 @@ public abstract class Piece implements Serializable {
 	
 	private Player owner;//TODO: this may need to be public and changed when the piece is taken and passed (bughouse)
 	protected Piece originalType = null;//necessary for pawns (bughouse)
-	protected Tile loc = null;
+	public Tile loc = null;
 	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
 									 //also used for King castling for efficiency event though lastTurnMoved could be used
 	protected int lastTurnMoved = -1;//necessary for en passant
@@ -23,6 +23,9 @@ public abstract class Piece implements Serializable {
 	}
 	public Player getOwner() {
 		return owner;
+	}
+	public void setOwner(Player owner) {
+		this.owner = owner; 
 	}
 	public int getX() {
 		return loc.x;

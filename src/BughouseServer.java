@@ -22,6 +22,13 @@ public class BughouseServer extends Thread {
 	public BughouseServer() {
 		g.add(new Game());
 		g.add(new Game());
+		//Setup partners and gameCount
+		for(int i = 0;i<2;i++) {
+			g.get(i).pW.partner = g.get((i+1)%2).pB;
+			g.get(i).pB.partner = g.get((i+1)%2).pW;
+			g.get(i).pW.gameCount++;
+			g.get(i).pB.gameCount++;
+		}
 
 		//setup serversocket
 		try {
@@ -54,10 +61,6 @@ public class BughouseServer extends Thread {
 			}
 		}
 
-		g.get(0).pB.gameCount++;
-		g.get(0).pW.gameCount++;
-		g.get(1).pB.gameCount++;
-		g.get(1).pW.gameCount++;
 		Collections.shuffle(playerList);
 		for(int i = 0;i<PLAYER_TOTAL;i++) {
 			ClientHandler ch = playerList.get(i);
@@ -109,17 +112,16 @@ public class BughouseServer extends Thread {
 						boolean validMove = g.get(move.player.gameID).applyMove(move);//handles legal checks
 						
 						if(validMove) {
-							g.get(move.player.gameID).pW.pickupQueue();
-							g.get(move.player.gameID).pB.pickupQueue();
-	
-							int otherGameID = (move.player.gameID+1) % 2;
-							PieceColor pc = move.player.color.getOpponent();
-							Player receivingPiecePlayer = g.get(otherGameID).getPlayer(pc);
-							for(Piece p : g.get(move.player.gameID).turn.deadPieces) {//this should be 0 or 1 but whatever
-								receivingPiecePlayer.queuingPieces.add(p);
+							move = new Move(move, g.get(move.player.gameID));//dereferences the Move from the game, necessary for the server
+							move.player.pickupQueue();
+							move.player.opponent.pickupQueue();
+							
+							for(Piece p : move.player.opponent.deadPieces) {
+								p.loc = null;
+								p.setOwner(move.player.partner);
+								move.player.partner.queuingPieces.add(p);//TODO: MAYBE ADD THIS TO HELDPIECES IF IT'S NOT PARTNER'S TURN
 							}
-							//Note: after applying the move, it is now the other player's turn
-							g.get(move.player.gameID).turn.deadPieces.clear();
+							move.player.opponent.deadPieces.clear();
 						}
 
 						for(ClientHandler ch : playerList) {
