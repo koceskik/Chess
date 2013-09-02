@@ -14,7 +14,7 @@ public class Pawn extends Piece {
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		int dirOfMovement;
 		int specialPos;//location of double move
-		if(g.turn.color == PieceColor.W) {
+		if(g.turn.color == PieceColor.W) {//TODO: change this to this.owner.color?
 			dirOfMovement = -1;
 			specialPos = 6;
 		}
@@ -24,10 +24,9 @@ public class Pawn extends Piece {
 		}
 		int x = getX();
 		int y = getY();
-		Tile t = g.board[y][x];
 		if(y+dirOfMovement >= 0 && y+dirOfMovement < 8) {
 			if(g.board[y+dirOfMovement][x].getPiece() == null) {
-				Move m = new Move(t, g.board[y+dirOfMovement][x]);//regular forward move
+				Move m = new Move(this, g.board[y+dirOfMovement][x]);//regular forward move
 				if(ignoreCheck) {
 					moveList.add(m);
 				}
@@ -35,7 +34,7 @@ public class Pawn extends Piece {
 					moveList.add(m);					
 				}
 				if(y == specialPos && g.board[y+2*dirOfMovement][x].getPiece() == null) {
-					m = new Move(t, g.board[y+2*dirOfMovement][x]);//initial double move
+					m = new Move(this, g.board[y+2*dirOfMovement][x]);//initial double move
 					if(ignoreCheck) {
 						moveList.add(m);
 					}
@@ -47,7 +46,7 @@ public class Pawn extends Piece {
 			if(x >= 1) {
 				if(g.board[y+dirOfMovement][x-1].getPiece() != null) {
 					if(g.board[y+dirOfMovement][x-1].getPiece().getOwner() == g.getOpponent()) {
-						Move m = new Move(t, g.board[y+dirOfMovement][x-1]);//attack left
+						Move m = new Move(this, g.board[y+dirOfMovement][x-1]);//attack left
 						if(ignoreCheck) {
 							moveList.add(m);
 						}
@@ -61,7 +60,7 @@ public class Pawn extends Piece {
 					if(p.getOwner() == g.getOpponent()) {
 						if(p instanceof Pawn) {
 							if(p.lastTurnMoved == g.turnCount-1 && p.numOfMovesMade == 1) {
-								Move m = new Move(t, g.board[y+dirOfMovement][x-1]);//left en passant
+								Move m = new Move(this, g.board[y+dirOfMovement][x-1]);//left en passant
 								if(ignoreCheck) {
 									moveList.add(m);
 								}
@@ -76,7 +75,7 @@ public class Pawn extends Piece {
 			if(x <= 6) {
 				if(g.board[y+dirOfMovement][x+1].getPiece() != null) {
 					if(g.board[y+dirOfMovement][x+1].getPiece().getOwner() == g.getOpponent()) {
-						Move m = new Move(t, g.board[y+dirOfMovement][x+1]);//attack right
+						Move m = new Move(this, g.board[y+dirOfMovement][x+1]);//attack right
 						if(ignoreCheck) {
 							moveList.add(m);
 						}
@@ -90,7 +89,7 @@ public class Pawn extends Piece {
 					if(p.getOwner() == g.getOpponent()) {
 						if(p instanceof Pawn) {
 							if(p.lastTurnMoved == g.turnCount-1 && p.numOfMovesMade == 1) {
-								Move m = new Move(t, g.board[y+dirOfMovement][x+1]);//right en passant
+								Move m = new Move(this, g.board[y+dirOfMovement][x+1]);//right en passant
 								if(ignoreCheck) {
 									moveList.add(m);
 								}

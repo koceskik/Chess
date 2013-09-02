@@ -7,7 +7,7 @@ public abstract class Piece implements Serializable {
 	private Player owner;//TODO: this may need to be public and changed when the piece is taken and passed (bughouse)
 	protected Piece originalType = null;//necessary for pawns (bughouse)
 	protected Tile loc = null;
-	protected int numOfMovesMade = 0;//necessary for en passant only if the pawn moved 2 spaces in first turn
+	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
 									 //also used for King castling for efficiency event though lastTurnMoved could be used
 	protected int lastTurnMoved = -1;//necessary for en passant
 
@@ -33,4 +33,20 @@ public abstract class Piece implements Serializable {
 	public abstract String getTileCode();
 	
 	public abstract ArrayList<Move> getLegalMoves(Game g, boolean ignoreCheck);
+	
+	public ArrayList<Move> getLegalPlacement(Game g) {
+		ArrayList<Move> moveList = new ArrayList<Move>();
+		for(int x = 0;x<8;x++) {
+			for(int y = 0;y<8;y++) {
+				if(this instanceof Pawn) {
+					if(y == 0 || y == 7) continue;
+				}
+				if(g.board[y][x].getPiece() == null) {
+					Move m = new Move(this, g.board[y][x]);
+					moveList.add(m);
+				}
+			}
+		}
+		return moveList;
+	}
 }

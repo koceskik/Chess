@@ -14,7 +14,6 @@ public class King extends Piece {
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		int x = getX();
 		int y = getY();
-		Tile t = g.board[y][x];
 		int[] tempX = {0,1,1,1,0,-1,-1,-1};
 		int[] tempY = {1,1,0,-1,-1,-1,0,1};
 		boolean rightMoveFine = false;//used for castling on right side (moving right isn't in check)
@@ -22,7 +21,7 @@ public class King extends Piece {
 		for(int i = 0;i<tempX.length;i++) {
 			if(x+tempX[i] >= 0 && x+tempX[i] < 8 && y+tempY[i] >= 0 && y+tempY[i] < 8) {
 				if(g.board[y+tempY[i]][x+tempX[i]].getPiece() == null || !g.board[y+tempY[i]][x+tempX[i]].getPiece().getOwner().equals(g.turn)) {//note: if statement optimization
-					Move m = new Move(t, g.board[y+tempY[i]][x+tempX[i]]);
+					Move m = new Move(this, g.board[y+tempY[i]][x+tempX[i]]);
 					if(ignoreCheck) {
 						moveList.add(m);
 						if(i == 2) rightMoveFine = true;
@@ -39,7 +38,7 @@ public class King extends Piece {
 		if(numOfMovesMade == 0 && !ignoreCheck && !g.inCheck()) {//TODO: is this right?
 			if(g.board[y][x+1].getPiece() == null && g.board[y][x+2].getPiece() == null && rightMoveFine) {
 				if(g.board[y][x+3].getPiece() != null && g.board[y][x+3].getPiece() instanceof Rook && g.board[y][x+3].getPiece().numOfMovesMade == 0) {
-					Move m = new Move(t, g.board[y][x+2]);
+					Move m = new Move(this, g.board[y][x+2]);
 					if(ignoreCheck) {
 						moveList.add(m);
 					}
@@ -51,7 +50,7 @@ public class King extends Piece {
 
 			if(g.board[y][x-1].getPiece() == null && g.board[y][x-2].getPiece() == null && g.board[y][x-3].getPiece() == null && leftMoveFine) {
 				if(g.board[y][x-4].getPiece() != null && g.board[y][x-4].getPiece() instanceof Rook && g.board[y][x-4].getPiece().numOfMovesMade == 0) {
-					Move m = new Move(t, g.board[y][x-2]);
+					Move m = new Move(this, g.board[y][x-2]);
 					if(ignoreCheck) {
 						moveList.add(m);
 					}

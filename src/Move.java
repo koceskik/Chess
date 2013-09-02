@@ -9,7 +9,9 @@ public class Move implements Serializable {
 	public static final int PROMOTE_KNIGHT = 4;
 	public static final int PROMOTE_ROOK = 5;
 	public static final int PROMOTE_BISHOP = 6;
+	public static final int PLACEMENT = 7;
 
+	public Piece movingPiece;
 	public Tile fromTile;
 	public Tile toTile;
 	public int moveType;
@@ -25,7 +27,20 @@ public class Move implements Serializable {
 		this.moveType = NORMAL;
 		this.player = p;
 	}
+	public Move(Piece piece, Tile toTile) {
+		movingPiece = piece;
+		this.fromTile = piece.loc;
+		this.toTile = toTile;
+		this.moveType = PLACEMENT;
+	}
+	public Move(Piece piece, Tile toTile, Player p) {
+		movingPiece = piece;
+		this.fromTile = piece.loc;
+		this.toTile = toTile;
+		this.moveType = PLACEMENT;
+		this.player = p;
+	}
 	public boolean equals(Move m) {
-		return fromTile.equals(m.fromTile) && toTile.equals(m.toTile);
+		return fromTile.equals(m.fromTile) && toTile.equals(m.toTile);//TODO: will this need to be changed to account for movingPiece
 	}
 }
