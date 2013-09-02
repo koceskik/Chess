@@ -20,7 +20,7 @@ public class King extends Piece {
 		boolean leftMoveFine = false;//used for castling on left side (moving left isn't in check)
 		for(int i = 0;i<tempX.length;i++) {
 			if(x+tempX[i] >= 0 && x+tempX[i] < 8 && y+tempY[i] >= 0 && y+tempY[i] < 8) {
-				if(g.board[y+tempY[i]][x+tempX[i]].getPiece() == null || !g.board[y+tempY[i]][x+tempX[i]].getPiece().getOwner().equals(g.turn)) {//note: if statement optimization
+				if(g.board[y+tempY[i]][x+tempX[i]].getPiece() == null || g.board[y+tempY[i]][x+tempX[i]].getPiece().getOwner() != this.getOwner()) {//note: if statement optimization
 					Move m = new Move(this, g.board[y+tempY[i]][x+tempX[i]]);
 					if(ignoreCheck) {
 						moveList.add(m);

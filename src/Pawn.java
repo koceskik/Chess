@@ -14,7 +14,7 @@ public class Pawn extends Piece {
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		int dirOfMovement;
 		int specialPos;//location of double move
-		if(g.turn.color == PieceColor.W) {//TODO: change this to this.owner.color?
+		if(this.getOwner().color == PieceColor.W) {
 			dirOfMovement = -1;
 			specialPos = 6;
 		}
@@ -24,7 +24,7 @@ public class Pawn extends Piece {
 		}
 		int x = getX();
 		int y = getY();
-		if(y+dirOfMovement >= 0 && y+dirOfMovement < 8) {
+		if(y+dirOfMovement >= 0 && y+dirOfMovement < 8) {//TODO: isn't this unnecessary because of auto-promotion and non-placement on 1st/last row
 			if(g.board[y+dirOfMovement][x].getPiece() == null) {
 				Move m = new Move(this, g.board[y+dirOfMovement][x]);//regular forward move
 				if(ignoreCheck) {
@@ -45,7 +45,7 @@ public class Pawn extends Piece {
 			}
 			if(x >= 1) {
 				if(g.board[y+dirOfMovement][x-1].getPiece() != null) {
-					if(g.board[y+dirOfMovement][x-1].getPiece().getOwner() == g.getOpponent()) {
+					if(g.board[y+dirOfMovement][x-1].getPiece().getOwner() != this.getOwner()) {
 						Move m = new Move(this, g.board[y+dirOfMovement][x-1]);//attack left
 						if(ignoreCheck) {
 							moveList.add(m);
@@ -57,7 +57,7 @@ public class Pawn extends Piece {
 				}
 				if(g.board[y][x-1].getPiece() != null) {
 					Piece p = g.board[y][x-1].getPiece();
-					if(p.getOwner() == g.getOpponent()) {
+					if(p.getOwner() != this.getOwner()) {
 						if(p instanceof Pawn) {
 							if(p.lastTurnMoved == g.turnCount-1 && p.numOfMovesMade == 1) {
 								Move m = new Move(this, g.board[y+dirOfMovement][x-1]);//left en passant
@@ -74,7 +74,7 @@ public class Pawn extends Piece {
 			}
 			if(x <= 6) {
 				if(g.board[y+dirOfMovement][x+1].getPiece() != null) {
-					if(g.board[y+dirOfMovement][x+1].getPiece().getOwner() == g.getOpponent()) {
+					if(g.board[y+dirOfMovement][x+1].getPiece().getOwner() != this.getOwner()) {
 						Move m = new Move(this, g.board[y+dirOfMovement][x+1]);//attack right
 						if(ignoreCheck) {
 							moveList.add(m);
@@ -86,7 +86,7 @@ public class Pawn extends Piece {
 				}
 				if(g.board[y][x+1].getPiece() != null) {
 					Piece p = g.board[y][x+1].getPiece();
-					if(p.getOwner() == g.getOpponent()) {
+					if(p.getOwner() != this.getOwner()) {
 						if(p instanceof Pawn) {
 							if(p.lastTurnMoved == g.turnCount-1 && p.numOfMovesMade == 1) {
 								Move m = new Move(this, g.board[y+dirOfMovement][x+1]);//right en passant

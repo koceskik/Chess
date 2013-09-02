@@ -115,8 +115,6 @@ public class GameHolder {
 			boardPanel.add(heldPiecesScrollPane, grid);
 		}
 		
-		//TODO: create class HeldPiecesPanel extends JPanel implements Scrollable to set the preferred viewport size
-		//TODO: MAYBE NOT since we need to know ahead of time the max size so it doesn't resize the window
 		heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));
 		heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		heldPiecesScrollPane.setBorder(nullBorder);
