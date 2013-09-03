@@ -47,8 +47,11 @@ public class GameHolder {
 	private JLabel[] yAxisLabel = new JLabel[8];
 	private JLabel[][] label = new JLabel[8][8];
 	private ArrayList<JLabel> heldPieces = new ArrayList<JLabel>();
+	private ArrayList<JLabel> oppHeldPieces = new ArrayList<JLabel>();
 	private JPanel heldPiecesPanel = new JPanel();
+	private JPanel oppHeldPiecesPanel = new JPanel();
 	private JScrollPane heldPiecesScrollPane = new JScrollPane(heldPiecesPanel);
+	private JScrollPane oppHeldPiecesScrollPane = new JScrollPane(oppHeldPiecesPanel);
 	
 	private JLabel getLabel(int x, int y) {
 		if(pc == PieceColor.W) {
@@ -101,29 +104,47 @@ public class GameHolder {
 			JLabel newHeldPiece = new JLabel();
 			heldPieces.add(newHeldPiece);
 			heldPiecesPanel.add(newHeldPiece);
+			
+			JLabel newOppHeldPiece = new JLabel();
+			oppHeldPieces.add(newOppHeldPiece);
+			oppHeldPiecesPanel.add(newOppHeldPiece);
 		}
 		heldPiecesPanel.setBorder(nullBorder);
 		heldPiecesPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		((FlowLayout) heldPiecesPanel.getLayout()).setVgap(0);
 		((FlowLayout) heldPiecesPanel.getLayout()).setHgap(0);
 		
-		grid.gridx = 1;
-		grid.gridy = 11;
-		grid.gridwidth = 8;
+		oppHeldPiecesPanel.setBorder(nullBorder);
+		oppHeldPiecesPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		((FlowLayout) oppHeldPiecesPanel.getLayout()).setVgap(0);
+		((FlowLayout) oppHeldPiecesPanel.getLayout()).setHgap(0);
 		
 		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {//TODO: this.g.pW.partner != null
+			grid.gridx = 1;
+			grid.gridy = 1;
+			grid.gridwidth = 8;
+			
+			oppHeldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));
+			oppHeldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+			oppHeldPiecesScrollPane.setBorder(nullBorder);
+			boardPanel.add(oppHeldPiecesScrollPane, grid);
+			
+			grid.gridy = 12;
+			heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));
+			heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+			heldPiecesScrollPane.setBorder(nullBorder);
 			boardPanel.add(heldPiecesScrollPane, grid);
 		}
-		
-		heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));
-		heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		heldPiecesScrollPane.setBorder(nullBorder);
 		
 		grid.gridwidth = 1;
 		initBoard();
 	}
 	
 	private void initBoard() {
+		int addLine = 0;
+		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {
+			addLine = 1;
+		}
 		for(int i = 0;i<8;i++) {
 			yAxisLabel[i] = new JLabel();
 			if(pc == PieceColor.W) {
@@ -133,17 +154,17 @@ public class GameHolder {
 				yAxisLabel[i].setText(String.valueOf(i+1));
 			}
 			grid.gridx = 0;
-			grid.gridy = i+2;
+			grid.gridy = i+2+addLine;
 			boardPanel.add(yAxisLabel[i],grid);
 			for(int j = 0;j<8;j++) {
 				label[i][j] = new JLabel();
 				label[i][j].setPreferredSize(d);//necessary to prevent the resizing onClick (adds border)
 				grid.gridx = j+1;
-				grid.gridy = i+2;
+				grid.gridy = i+2+addLine;
 				boardPanel.add(label[i][j],grid);
 			}
 		}
-		grid.gridy = 10;
+		grid.gridy = 10+addLine;
 		for(int i = 0;i<8;i++) {
 			xAxisLabel[i] = new JLabel();
 			if(pc == PieceColor.W) {
@@ -174,6 +195,7 @@ public class GameHolder {
 		}
 		//display a winner
 		if(g.getWinner() != null) {
+			System.out.println(g.getWinner() + "," + g.getWinner().color);
 			if(g.getWinner().color == PieceColor.W) {
 				whiteLabelPanel.setBorder(legalMoveBorder);
 				blackLabelPanel.setBorder(nullBorder);
@@ -200,20 +222,34 @@ public class GameHolder {
 			player = g.pB;
 		}
 		
-		//int i = 0;
-		for(int j = 0;j<heldPieces.size();j++) {
-			if(j < player.heldPieces.size()) {
-				heldPieces.get(j).setIcon(Tile.getHeldIcon(player.heldPieces.get(j), true));
-				//i++;
+		for(int i = 0;i<heldPieces.size();i++) {
+			if(i < player.heldPieces.size()) {
+				heldPieces.get(i).setIcon(Tile.getHeldIcon(player.heldPieces.get(i), true));
 			}
-			else if(j < player.heldPieces.size()+player.queuingPieces.size()) {
-				heldPieces.get(j).setIcon(Tile.getHeldIcon(player.queuingPieces.get(j - player.heldPieces.size()), false));
+			else if(i < player.heldPieces.size()+player.queuingPieces.size()) {
+				heldPieces.get(i).setIcon(Tile.getHeldIcon(player.queuingPieces.get(i - player.heldPieces.size()), false));
 			}
 			else {
-				heldPieces.get(j).setIcon(null);
+				heldPieces.get(i).setIcon(null);
 			}
 		}
 		heldPiecesScrollPane.revalidate();
+		
+		System.out.println("OPP HELD PIECES SIZE: " + oppHeldPieces.size());
+		System.out.println("PLAYER.OPP HELD PIECES SIZE: " + player.opponent.heldPieces.size());
+		System.out.println("PLAYER.OPP QUEUE PIECES SIZE: " + player.opponent.queuingPieces.size());
+		for(int i = 0;i<oppHeldPieces.size();i++) {
+			if(i < player.opponent.heldPieces.size()) {
+				oppHeldPieces.get(i).setIcon(Tile.getHeldIcon(player.opponent.heldPieces.get(i), true));
+			}
+			else if(i < player.opponent.heldPieces.size()+player.opponent.queuingPieces.size()) {
+				oppHeldPieces.get(i).setIcon(Tile.getHeldIcon(player.opponent.queuingPieces.get(i - player.opponent.heldPieces.size()), false));
+			}
+			else {
+				oppHeldPieces.get(i).setIcon(null);
+			}
+		}
+		oppHeldPiecesScrollPane.revalidate();
 	}
 	
 	public void initLabelClicks(final Player p) {

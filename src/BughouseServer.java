@@ -109,7 +109,21 @@ public class BughouseServer extends Thread {
 				try {
 					while(true) {
 						Move move = (Move) ois.readObject();
-						boolean validMove = g.get(move.player.gameID).applyMove(move);//handles legal checks
+						int gameID = move.player.gameID;
+						boolean validMove = g.get(gameID).applyMove(move);//handles legal checks
+						int totalLegalMoves = 0;
+						for(Piece p : g.get(gameID).turn.pieceList) {
+							totalLegalMoves += p.getLegalMoves(g.get(gameID), false).size();
+						}
+						for(Piece p : g.get(gameID).turn.heldPieces) {
+							totalLegalMoves += p.getLegalPlacement(g.get(gameID)).size();
+						}
+						if(totalLegalMoves == 0) {
+							g.get(0).setWinner(g.get(gameID).getOpponent());
+							g.get(1).setWinner(g.get(gameID).getOpponent());
+							System.out.println(g.get(0).getWinner() + "," + g.get(0).getWinner().color);
+							System.out.println(g.get(1).getWinner() + "," + g.get(1).getWinner().color);
+						}
 						
 						if(validMove) {
 							move = new Move(move, g.get(move.player.gameID));//dereference from the Game, necessary for the server
@@ -117,9 +131,18 @@ public class BughouseServer extends Thread {
 							move.player.opponent.pickupQueue();
 							
 							for(Piece p : move.player.opponent.deadPieces) {
+								if(!(p instanceof Pawn) && p.originalType == PieceType.P) {
+									p = new Pawn(move.player.partner);
+								}
 								p.loc = null;
 								p.setOwner(move.player.partner);
-								move.player.partner.queuingPieces.add(p);//TODO: MAYBE ADD THIS TO HELDPIECES IF IT'S NOT PARTNER'S TURN
+								
+								if(g.get((move.player.gameID+1)%2).turn == move.player.partner) {
+									move.player.partner.queuingPieces.add(p);//Adds piece to queuingPieces if it's the partner's turn 
+								}
+								else {
+									move.player.partner.heldPieces.add(p);//Adds piece to heldPieces if it's not partner's turn (helps partner's opponent see what to deal with)
+								}
 							}
 							move.player.opponent.deadPieces.clear();
 						}
