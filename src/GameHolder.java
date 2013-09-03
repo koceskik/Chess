@@ -111,7 +111,7 @@ public class GameHolder {
 		grid.gridy = 11;
 		grid.gridwidth = 8;
 		
-		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {
+		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {//TODO: this.g.pW.partner != null
 			boardPanel.add(heldPiecesScrollPane, grid);
 		}
 		
