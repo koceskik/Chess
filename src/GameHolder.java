@@ -235,9 +235,6 @@ public class GameHolder {
 		}
 		heldPiecesScrollPane.revalidate();
 		
-		System.out.println("OPP HELD PIECES SIZE: " + oppHeldPieces.size());
-		System.out.println("PLAYER.OPP HELD PIECES SIZE: " + player.opponent.heldPieces.size());
-		System.out.println("PLAYER.OPP QUEUE PIECES SIZE: " + player.opponent.queuingPieces.size());
 		for(int i = 0;i<oppHeldPieces.size();i++) {
 			if(i < player.opponent.heldPieces.size()) {
 				oppHeldPieces.get(i).setIcon(Tile.getHeldIcon(player.opponent.heldPieces.get(i), true));
