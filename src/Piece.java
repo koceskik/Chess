@@ -46,6 +46,7 @@ public abstract class Piece implements Serializable {
 				}
 				if(g.board[y][x].getPiece() == null) {
 					Move m = new Move(this, g.board[y][x]);
+					m.moveType = Move.MoveType.PLACEMENT;
 					moveList.add(m);
 				}
 			}

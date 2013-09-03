@@ -73,16 +73,24 @@ public class Game implements Serializable {
 	public boolean isLegalMove(Move m) {
 		if(!m.player.equals(turn)) return false;
 		
-		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
-		m.toTile = board[m.toTile.y][m.toTile.x];
-		if(m.piece instanceof Pawn && m.toTile.getPiece() == null) {
-			if(m.piece.getX() != m.toTile.x) m.moveType = Move.MoveType.EN_PASSANT;
-		}
-		else if(m.piece instanceof King && Math.abs(m.toTile.x-m.piece.getX()) == 2) {
-			m.moveType = Move.MoveType.CASTLE;
-		}
-		ArrayList<Move> legalMoveList = m.piece.getLegalMoves(this, false);
+		ArrayList<Move> legalMoveList;
 		boolean mInLegalMoveList = false;
+		if(m.moveType == Move.MoveType.PLACEMENT) {
+			m = new Move(m, this);
+			legalMoveList = m.piece.getLegalPlacement(this);
+		}
+		else {
+			m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
+			m.toTile = board[m.toTile.y][m.toTile.x];
+			if(m.piece instanceof Pawn && m.toTile.getPiece() == null) {
+				if(m.piece.getX() != m.toTile.x) m.moveType = Move.MoveType.EN_PASSANT;
+			}
+			else if(m.piece instanceof King && Math.abs(m.toTile.x-m.piece.getX()) == 2) {
+				m.moveType = Move.MoveType.CASTLE;
+			}
+			
+			legalMoveList = m.piece.getLegalMoves(this, false);
+		}
 		for(Move lm : legalMoveList) {//legalMoveList.contains(m) doesn't seem to work
 			if(lm.equals(m)) {
 				mInLegalMoveList = true;
@@ -92,24 +100,9 @@ public class Game implements Serializable {
 	}
 
 	public boolean applyMove(Move m) {//returns true if applied
-		if(!m.player.equals(turn)) return false;
+		boolean mInLegalMoveList = isLegalMove(m);//handles the setting of m.moveType for EN_PASSANT and CASTLE
+		m = new Move(m, this);//because the PLACEMENT one just instantiates a new one over the parameter reference
 
-		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
-		m.toTile = board[m.toTile.y][m.toTile.x];
-		if(m.piece instanceof Pawn && m.toTile.getPiece() == null) {
-			if(m.piece.getX() != m.toTile.x) m.moveType = Move.MoveType.EN_PASSANT;
-		}
-		else if(m.piece instanceof King && Math.abs(m.toTile.x-m.piece.getX()) == 2) {
-			m.moveType = Move.MoveType.CASTLE;
-		}
-		ArrayList<Move> legalMoveList = m.piece.getLegalMoves(this, false);
-		boolean mInLegalMoveList = false;
-		for(Move lm : legalMoveList) {//legalMoveList.contains(m) doesn't seem to work
-			if(lm.equals(m)) {
-				mInLegalMoveList = true;
-			}
-		}
-		
 		if(mInLegalMoveList) {
 			if(m.moveType == Move.MoveType.EN_PASSANT) {
 				Piece enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
@@ -132,7 +125,13 @@ public class Game implements Serializable {
 				getOpponent().deadPieces.add(m.toTile.getPiece());
 			}
 
-			m.piece.loc.addPiece(null);//order matters
+			if(m.moveType != Move.MoveType.PLACEMENT) {//order matters
+				m.piece.loc.addPiece(null);
+			}
+			else {
+				m.player.heldPieces.remove(m.piece);
+				m.player.pieceList.add(m.piece);
+			}
 			m.toTile.addPiece(m.piece);
 
 			if(m.toTile.getPiece() instanceof Pawn) {

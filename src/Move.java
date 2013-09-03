@@ -44,9 +44,19 @@ public class Move implements Serializable {
 		this.player = p;
 	}
 	public Move(Move m, Game g) {
-		this.piece = g.board[m.piece.getY()][m.piece.getX()].getPiece();
 		this.toTile = g.board[m.toTile.y][m.toTile.x];
 		this.player = g.getPlayer(m.player.color);
+		if(m.moveType == MoveType.PLACEMENT) {
+			for(Piece p : this.player.heldPieces) {
+				if(p.getClass() == m.piece.getClass()) {
+					this.piece = p;
+				}
+			}
+		}
+		else {
+			this.piece = g.board[m.piece.getY()][m.piece.getX()].getPiece();
+		}
+		this.moveType = m.moveType;
 	}
 	public boolean equals(Move m) {
 		return piece.equals(m.piece) && toTile.equals(m.toTile);//TODO: will this need to be changed to account for movingPiece

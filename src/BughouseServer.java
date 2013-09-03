@@ -112,7 +112,7 @@ public class BughouseServer extends Thread {
 						boolean validMove = g.get(move.player.gameID).applyMove(move);//handles legal checks
 						
 						if(validMove) {
-							move = new Move(move, g.get(move.player.gameID));//dereferences the Move from the game, necessary for the server
+							move = new Move(move, g.get(move.player.gameID));//dereference from the Game, necessary for the server
 							move.player.pickupQueue();
 							move.player.opponent.pickupQueue();
 							

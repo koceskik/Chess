@@ -24,8 +24,8 @@ public class GameHolder {
 	public static final Border selectedBorder = BorderFactory.createLineBorder(Color.red);
 	public static final Border legalMoveBorder = BorderFactory.createLineBorder(Color.blue);
 	public static final Border nullBorder = BorderFactory.createEmptyBorder();
-	private Tile selectedTile = null;
-	private Integer selectedHeldPieceNum = null;
+	private Piece selectedPiece = null;
+	private int selectedHeldPiece = -1;
 	private ArrayList<Move> legalMoveList = new ArrayList<Move>();
 	private void clearLegalMoves() {
 		for(Move m : legalMoveList) {
@@ -199,11 +199,19 @@ public class GameHolder {
 		else {
 			player = g.pB;
 		}
-		for(int i = 0;i<player.heldPieces.size();i++) {
-			heldPieces.get(i).setIcon(Tile.getHeldIcon(player.heldPieces.get(i), true));
-		}
-		for(int i = 0;i<player.queuingPieces.size();i++) {
-			heldPieces.get(player.heldPieces.size()+i).setIcon(Tile.getHeldIcon(player.queuingPieces.get(i), false));
+		
+		//int i = 0;
+		for(int j = 0;j<heldPieces.size();j++) {
+			if(j < player.heldPieces.size()) {
+				heldPieces.get(j).setIcon(Tile.getHeldIcon(player.heldPieces.get(j), true));
+				//i++;
+			}
+			else if(j < player.heldPieces.size()+player.queuingPieces.size()) {
+				heldPieces.get(j).setIcon(Tile.getHeldIcon(player.queuingPieces.get(j), false));
+			}
+			else {
+				heldPieces.get(j).setIcon(null);
+			}
 		}
 		heldPiecesScrollPane.revalidate();
 	}
@@ -218,35 +226,46 @@ public class GameHolder {
 					@Override
 					public void mousePressed(MouseEvent arg0) {
 						if(g.turn.equals(p)) {
-							if(selectedTile == null) {
+							if(selectedPiece == null) {
 								if(g.board[y][x].getPiece() != null) {
 									if(g.board[y][x].getPiece().getColor() == p.color) {
-										selectedTile = g.board[y][x];
+										selectedPiece = g.board[y][x].getPiece();
 										getLabel(x,y).setBorder(selectedBorder);
 
-										for(Move m : g.getLegalMove(selectedTile)) {
+										for(Move m : selectedPiece.getLegalMoves(g, false)) {
 											legalMoveList.add(m);
 											getLabel(m.toTile.x, m.toTile.y).setBorder(legalMoveBorder);
 										}
 									}
 								}
 							}
-							else if(selectedTile == g.board[y][x]) {
+							else if(selectedPiece == g.board[y][x].getPiece()) {
 								clearLegalMoves();
 								getLabel(x,y).setBorder(nullBorder);
-								selectedTile = null;
+								selectedPiece = null;
 							}
 							else {
-								Move m = new Move(selectedTile.getPiece(), g.board[y][x], p);
-								if(selectedTile.getPiece() instanceof Pawn && (y == 0 || y == 7)) {
-									m.moveType = Move.MoveType.getPromotionType(promotionList.getSelectedIndex());
+								if(selectedPiece.loc != null) {
+									Move m = new Move(selectedPiece, g.board[y][x], p);
+									if(selectedPiece instanceof Pawn && (y == 0 || y == 7)) {
+										m.moveType = Move.MoveType.getPromotionType(promotionList.getSelectedIndex());
+									}
+									if(g.isLegalMove(m)) {
+										self.send(m);
+										getLabel(selectedPiece.getX(),selectedPiece.getY()).setBorder(nullBorder);
+										selectedPiece = null;
+										clearLegalMoves();
+									}
 								}
-								//if(g.applyMove(m)) {
-								if(g.isLegalMove(m)) {
-									self.send(m);
-									getLabel(selectedTile.x,selectedTile.y).setBorder(nullBorder);
-									selectedTile = null;
-									clearLegalMoves();
+								else {
+									Move m = new Move(selectedPiece, g.board[y][x], p);
+									m.moveType = Move.MoveType.PLACEMENT;
+									if(g.isLegalMove(m)) {
+										self.send(m);
+										heldPieces.get(selectedHeldPiece).setBorder(nullBorder);
+										selectedPiece = null;
+										clearLegalMoves();
+									}
 								}
 							}
 						}
@@ -270,19 +289,21 @@ public class GameHolder {
 				@Override
 				public void mousePressed(MouseEvent arg0) {
 					if(g.turn.equals(p) && g.turn.heldPieces.size() > x) {
-						if(selectedHeldPieceNum == null) {
-							selectedHeldPieceNum = x;
+						if(selectedPiece == null) {
+							selectedPiece = g.turn.heldPieces.get(x);
+							selectedHeldPiece = x;
 							heldPieces.get(x).setBorder(selectedBorder);
 							
-							/*for(Move m : g.getLegalMove(selectedTile)) {
+							for(Move m : selectedPiece.getLegalPlacement(g)) {
 								legalMoveList.add(m);
 								getLabel(m.toTile.x, m.toTile.y).setBorder(legalMoveBorder);
-							}*/
+							}
 						}
-						else if(selectedHeldPieceNum == x) {
+						else if(selectedPiece == g.turn.heldPieces.get(x)) {
 							clearLegalMoves();
 							heldPieces.get(x).setBorder(nullBorder);
-							selectedHeldPieceNum = null;
+							selectedPiece = null;
+							selectedHeldPiece = -1;
 						}
 					}
 				}
@@ -296,7 +317,5 @@ public class GameHolder {
 				public void mouseReleased(MouseEvent arg0) {}
 			});
 		}
-		
-		
 	}
 }
