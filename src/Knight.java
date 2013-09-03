@@ -3,10 +3,9 @@ import java.util.ArrayList;
 public class Knight extends Piece {
 	private static final long serialVersionUID = 1L;
 
-	public Knight() {}
 	public Knight(Player owner) {
 		super(owner);
-		originalType = new Knight();
+		originalType = PieceType.N;
 	}
 
 	@Override

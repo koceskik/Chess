@@ -1,9 +1,4 @@
 
 public enum PieceType {
-	P,
-	N,
-	B,
-	R,
-	Q,
-	K;
+	P,N,B,R,Q,K;
 }

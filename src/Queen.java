@@ -3,10 +3,9 @@ import java.util.ArrayList;
 public class Queen extends Piece {
 	private static final long serialVersionUID = 1L;
 	
-	public Queen() {}
 	public Queen(Player owner) {
 		super(owner);
-		originalType = new Queen();
+		originalType = PieceType.Q;
 	}
 
 	@Override

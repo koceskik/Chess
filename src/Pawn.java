@@ -3,10 +3,9 @@ import java.util.ArrayList;
 public class Pawn extends Piece {
 	private static final long serialVersionUID = 1L;
 	
-	public Pawn() {}
 	public Pawn(Player owner) {
 		super(owner);
-		originalType = new Pawn();
+		originalType = PieceType.P;
 	}
 
 	@Override

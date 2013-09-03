@@ -138,7 +138,7 @@ public class Game implements Serializable {
 				Piece promotion = Move.MoveType.getPromotion(m.moveType, turn);
 				
 				if(promotion != null) {
-					promotion.originalType = new Pawn();
+					promotion.originalType = PieceType.P;
 					turn.pieceList.remove(m.toTile.getPiece());
 					turn.pieceList.add(promotion);
 					m.toTile.addPiece(promotion);
@@ -153,12 +153,20 @@ public class Game implements Serializable {
 		return mInLegalMoveList;
 	}
 	public boolean leavesPlayerInCheck(Move m) {//returns true if move leaves the user in check
-		m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
-		m.toTile = board[m.toTile.y][m.toTile.x];
+		m = new Move(m, this);//dereference from the Game, necessary for server
+		//m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
+		//m.toTile = board[m.toTile.y][m.toTile.x];
 		Piece toTilePiece = m.toTile.getPiece();
-		Piece enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
-		int fromX = m.piece.getX();//necessary because after moving the m.piece, there's no other reference to its original location
-		int fromY = m.piece.getY();
+		Piece enPassantPawn = null;
+		if(m.moveType != Move.MoveType.PLACEMENT) {
+			enPassantPawn = board[m.piece.getY()][m.toTile.x].getPiece();
+		}
+		int fromX = -1;
+		int fromY = -1;
+		if(m.moveType != Move.MoveType.PLACEMENT) {
+			fromX = m.piece.getX();//necessary because after moving the m.piece, there's no other reference to its original location
+			fromY = m.piece.getY();
+		}
 
 		if(toTilePiece != null) {
 			getOpponent().pieceList.remove(toTilePiece);
@@ -169,13 +177,22 @@ public class Game implements Serializable {
 			getOpponent().deadPieces.add(enPassantPawn);
 		}
 
-		m.piece.loc.addPiece(null);//order matters
+		if(m.moveType != Move.MoveType.PLACEMENT) {//order matters
+			m.piece.loc.addPiece(null);
+		}
 		m.toTile.addPiece(m.piece);
 
+		
 		boolean inCheck = inCheck();
 
+		
 		m.toTile.addPiece(toTilePiece);
-		board[fromY][fromX].addPiece(m.piece);
+		if(m.moveType != Move.MoveType.PLACEMENT) {
+			board[fromY][fromX].addPiece(m.piece);
+		}
+		else {
+			m.piece.loc = null;
+		}
 
 		if(m.moveType == Move.MoveType.EN_PASSANT) {
 			getOpponent().pieceList.add(enPassantPawn);

@@ -207,7 +207,7 @@ public class GameHolder {
 				//i++;
 			}
 			else if(j < player.heldPieces.size()+player.queuingPieces.size()) {
-				heldPieces.get(j).setIcon(Tile.getHeldIcon(player.queuingPieces.get(j), false));
+				heldPieces.get(j).setIcon(Tile.getHeldIcon(player.queuingPieces.get(j - player.heldPieces.size()), false));
 			}
 			else {
 				heldPieces.get(j).setIcon(null);

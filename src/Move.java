@@ -37,6 +37,7 @@ public class Move implements Serializable {
 	public Move(Piece piece, Tile toTile) {
 		this.piece = piece;
 		this.toTile = toTile;
+		this.player = this.piece.getOwner();
 	}
 	public Move(Piece piece, Tile toTile, Player p) {
 		this.piece = piece;

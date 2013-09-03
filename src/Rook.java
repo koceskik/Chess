@@ -3,10 +3,9 @@ import java.util.ArrayList;
 public class Rook extends Piece {
 	private static final long serialVersionUID = 1L;
 	
-	public Rook() {}
 	public Rook(Player owner) {
 		super(owner);
-		originalType = new Rook();
+		originalType = PieceType.R;
 	}
 
 	@Override
