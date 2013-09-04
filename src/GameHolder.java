@@ -76,9 +76,11 @@ public class GameHolder {
 	
 	private void initBoardPanel() {
 		boardPanel.setLayout(new GridBagLayout());
+		float fontSizeScaled = 9.0f;//this needs to be a float because int references the style not fontSize 
 		
 		whiteLabel.setText("White");
 		whiteLabelPanel.setBackground(Color.white);
+		if(d != dim) whiteLabel.setFont(whiteLabel.getFont().deriveFont(fontSizeScaled));
 		whiteLabelPanel.add(whiteLabel);
 		grid.gridwidth = 2;
 		if(d != dim) grid.gridwidth = 3;
@@ -87,6 +89,7 @@ public class GameHolder {
 		boardPanel.add(whiteLabelPanel, grid);
 		
 		blackLabel.setText("Black");
+		if(d != dim) blackLabel.setFont(blackLabel.getFont().deriveFont(fontSizeScaled));
 		blackLabel.setForeground(Color.white);
 		blackLabelPanel.setBackground(Color.black);
 		blackLabelPanel.add(blackLabel);
@@ -195,7 +198,6 @@ public class GameHolder {
 		}
 		//display a winner
 		if(g.getWinner() != null) {
-			System.out.println(g.getWinner() + "," + g.getWinner().color);
 			if(g.getWinner().color == PieceColor.W) {
 				whiteLabelPanel.setBorder(legalMoveBorder);
 				blackLabelPanel.setBorder(nullBorder);

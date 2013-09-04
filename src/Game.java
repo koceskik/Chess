@@ -56,8 +56,7 @@ public class Game implements Serializable {
 		return returner;
 	}
 	public Player getOpponent() {
-		if(turn == pW) return pB;
-		else return pW;
+		return turn.opponent;
 	}
 	public Player getPlayer(PieceColor pc) {
 		Player player;
@@ -154,8 +153,6 @@ public class Game implements Serializable {
 	}
 	public boolean leavesPlayerInCheck(Move m) {//returns true if move leaves the user in check
 		m = new Move(m, this);//dereference from the Game, necessary for server
-		//m.piece = board[m.piece.getY()][m.piece.getX()].getPiece();//dereference from the Game, necessary for server
-		//m.toTile = board[m.toTile.y][m.toTile.x];
 		Piece toTilePiece = m.toTile.getPiece();
 		Piece enPassantPawn = null;
 		if(m.moveType != Move.MoveType.PLACEMENT) {
@@ -221,12 +218,5 @@ public class Game implements Serializable {
 		}
 		turn = currentPlayer;
 		return inCheck;
-	}
-
-	public ArrayList<Move> getLegalMove(Tile t) {//returns a list of all legal moves, or empty if no legal moves
-		t = board[t.y][t.x];//dereference from the Game, necessary for server
-		if(t.getPiece() == null || t.getPiece().getOwner() != turn) return new ArrayList<Move>();
-
-		return t.getPiece().getLegalMoves(this, false);
 	}
 }
