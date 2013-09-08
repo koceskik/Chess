@@ -16,7 +16,7 @@ public class Knight extends Piece {
 		int[] tempX = {1,2,2,1,-1,-2,-2,-1};
 		int[] tempY = {2,1,-1,-2,-2,-1,1,2};
 		for(int i = 0;i<tempX.length;i++) {
-			if(x+tempX[i] >= 0 && x+tempX[i] < 8 && y+tempY[i] >= 0 && y+tempY[i] < 8) {
+			if(Game.isPointOnBoard(x+tempX[i], y+tempY[i])) {
 				if(g.board[y+tempY[i]][x+tempX[i]].getPiece() == null || g.board[y+tempY[i]][x+tempX[i]].getPiece().getOwner() != this.getOwner()) {//note: if statement optimization
 					Move m = new Move(this, g.board[y+tempY[i]][x+tempX[i]]);
 					if(ignoreCheck) {

@@ -44,6 +44,9 @@ public class Game implements Serializable {
 			}
 		}
 	}
+	public static boolean isPointOnBoard(int x, int y) {
+		return (x >= 0 && x < 8 && y >= 0 && y < 8);
+	}
 	public String toReadableString() {
 		String returner = "";
 		for(int i = 0;i<8;i++) {

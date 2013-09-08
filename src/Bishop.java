@@ -18,7 +18,7 @@ public class Bishop extends Piece {
 		for(int i = 0;i<dirX.length;i++) {
 			int tempX = x+dirX[i];
 			int tempY = y+dirY[i];
-			while(tempX >= 0 && tempX < 8 && tempY >= 0 && tempY < 8) {
+			while(Game.isPointOnBoard(tempX, tempY)) {
 				if(g.board[tempY][tempX].getPiece() == null || g.board[tempY][tempX].getPiece().getOwner() != this.getOwner()) {//note: if statement optimization
 					Move m = new Move(this, g.board[tempY][tempX]);
 					if(ignoreCheck) {
