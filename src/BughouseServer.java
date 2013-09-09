@@ -112,6 +112,7 @@ public class BughouseServer extends Thread {
 						int gameID = move.player.gameID;
 						boolean validMove = g.get(gameID).applyMove(move);//handles legal checks
 						int totalLegalMoves = 0;
+						boolean sendOtherBoard = false;//set in if(validMove), used before sending to clients
 						for(Piece p : g.get(gameID).turn.pieceList) {
 							totalLegalMoves += p.getLegalMoves(g.get(gameID), false).size();
 						}
@@ -121,8 +122,6 @@ public class BughouseServer extends Thread {
 						if(totalLegalMoves == 0) {
 							g.get(0).setWinner(g.get(gameID).getOpponent());
 							g.get(1).setWinner(g.get(gameID).getOpponent());
-							System.out.println(g.get(0).getWinner() + "," + g.get(0).getWinner().color);
-							System.out.println(g.get(1).getWinner() + "," + g.get(1).getWinner().color);
 						}
 						
 						if(validMove) {
@@ -130,6 +129,7 @@ public class BughouseServer extends Thread {
 							move.player.pickupQueue();
 							move.player.opponent.pickupQueue();
 							
+							sendOtherBoard = !move.player.opponent.deadPieces.isEmpty();
 							for(Piece p : move.player.opponent.deadPieces) {
 								if(!(p instanceof Pawn) && p.originalType == PieceType.P) {
 									p = new Pawn(move.player.partner);
@@ -152,14 +152,10 @@ public class BughouseServer extends Thread {
 								playerList.remove(ch);
 							}
 							else {
-								ch.send(g.get(0));//send both games, because a piece might have been added to the queue on the other board
-								ch.send(g.get(1));
-								/*
-								ch.send(g.get(move.player.gameID));//only sends the game that was changed 
-								int otherGameID = (move.player.gameID+1) % 2;
-								ch.send(g.get(otherGameID));
-								*/
-								//TODO: think about smart sending for when a piece is taken
+								ch.send(g.get(gameID));
+								if(sendOtherBoard) {
+									ch.send(g.get((gameID+1)%2));
+								}
 							}
 						}
 					}
