@@ -140,7 +140,7 @@ public class Game implements Serializable {
 				Piece promotion = Move.MoveType.getPromotion(m.moveType, turn);
 				
 				if(promotion != null) {
-					promotion.originalType = PieceType.P;
+					promotion.originalType = Piece.PieceType.P;
 					turn.pieceList.remove(m.toTile.getPiece());
 					turn.pieceList.add(promotion);
 					m.toTile.addPiece(promotion);

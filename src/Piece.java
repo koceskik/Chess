@@ -3,7 +3,10 @@ import java.util.ArrayList;
 
 public abstract class Piece implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+	public enum PieceType {
+		P,N,B,R,Q,K;
+	}
+
 	private Player owner;
 	public PieceType originalType;//necessary for pawns (bughouse)
 	public Tile loc = null;

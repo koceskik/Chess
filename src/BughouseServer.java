@@ -131,7 +131,7 @@ public class BughouseServer extends Thread {
 							
 							sendOtherBoard = !move.player.opponent.deadPieces.isEmpty();
 							for(Piece p : move.player.opponent.deadPieces) {
-								if(!(p instanceof Pawn) && p.originalType == PieceType.P) {
+								if(!(p instanceof Pawn) && p.originalType == Piece.PieceType.P) {
 									p = new Pawn(move.player.partner);
 								}
 								p.loc = null;
