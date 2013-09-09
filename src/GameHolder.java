@@ -122,7 +122,7 @@ public class GameHolder {
 		((FlowLayout) oppHeldPiecesPanel.getLayout()).setVgap(0);
 		((FlowLayout) oppHeldPiecesPanel.getLayout()).setHgap(0);
 		
-		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {//TODO: this.g.pW.partner != null
+		if(this.g.pW.partner != null) {
 			grid.gridx = 1;
 			grid.gridy = 1;
 			grid.gridwidth = 8;
