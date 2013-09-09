@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public abstract class Piece implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private Player owner;//TODO: this may need to be public and changed when the piece is taken and passed (bughouse)
+	private Player owner;
 	public PieceType originalType;//necessary for pawns (bughouse)
 	public Tile loc = null;
 	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
