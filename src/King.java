@@ -34,7 +34,7 @@ public class King extends Piece {
 				}
 			}
 		}
-		if(numOfMovesMade == 0 && !ignoreCheck && !g.inCheck()) {//TODO: is this right?
+		if(numOfMovesMade == 0 && !ignoreCheck && !g.inCheck()) {
 			if(g.board[y][x+1].getPiece() == null && g.board[y][x+2].getPiece() == null && rightMoveFine) {
 				if(g.board[y][x+3].getPiece() != null && g.board[y][x+3].getPiece() instanceof Rook && g.board[y][x+3].getPiece().numOfMovesMade == 0) {
 					Move m = new Move(this, g.board[y][x+2]);
