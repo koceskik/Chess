@@ -6,10 +6,10 @@ public class Player implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public PieceColor color = null;
-	public ArrayList<Piece> pieceList = new ArrayList<Piece>();
-	public ArrayList<Piece> deadPieces = new ArrayList<Piece>();//holds all dead pieces
-	public ArrayList<Piece> heldPieces = new ArrayList<Piece>();
-	public ArrayList<Piece> queuingPieces = new ArrayList<Piece>();
+	public ArrayList<Piece> pieceList = new ArrayList<Piece>();//holds on-board Pieces
+	public ArrayList<Piece> deadPieces = new ArrayList<Piece>();//holds dead Pieces (removed and passed to opponent's partner in bughouse) 
+	public ArrayList<Piece> heldPieces = new ArrayList<Piece>();//bughouse: holds usable, placeable Pieces
+	public ArrayList<Piece> queuingPieces = new ArrayList<Piece>();//bughouse, holds currently unusable, placeable Pieces (passed to heldPieces on next turn)
 	public Piece king = null;
 	public UUID id = UUID.randomUUID();
 	public int gameID;
