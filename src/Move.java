@@ -60,6 +60,6 @@ public class Move implements Serializable {
 		this.moveType = m.moveType;
 	}
 	public boolean equals(Move m) {
-		return piece.equals(m.piece) && toTile.equals(m.toTile);//TODO: will this need to be changed to account for movingPiece
+		return piece.equals(m.piece) && toTile.equals(m.toTile);
 	}
 }
