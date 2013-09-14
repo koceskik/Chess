@@ -5,6 +5,7 @@ public class Rook extends Piece {
 	
 	public Rook(Player owner) {
 		super(owner);
+		pieceType = PieceType.R;
 		originalType = PieceType.R;
 	}
 
@@ -35,12 +36,6 @@ public class Rook extends Piece {
 				tempY += dirY[i];
 			}
 		}
-		
 		return moveList;
 	}
-	@Override
-	public String getTileCode() {
-		return "R"; 
-	}
-
 }

@@ -8,6 +8,7 @@ public abstract class Piece implements Serializable {
 	}
 
 	private Player owner;
+	public PieceType pieceType;
 	public PieceType originalType;//necessary for pawns (bughouse)
 	public Tile loc = null;
 	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
@@ -35,7 +36,6 @@ public abstract class Piece implements Serializable {
 	public int getY() {
 		return loc.y;
 	}
-	public abstract String getTileCode();
 	
 	public abstract ArrayList<Move> getLegalMoves(Game g, boolean ignoreCheck);
 	
@@ -56,5 +56,9 @@ public abstract class Piece implements Serializable {
 			}
 		}
 		return moveList;
+	}
+	
+	public String getTileCode() {
+		return pieceType.toString();
 	}
 }

@@ -5,6 +5,7 @@ public class King extends Piece {
 
 	public King(Player owner) {
 		super(owner);
+		pieceType = PieceType.K;
 		originalType = PieceType.K;
 	}
 
@@ -61,9 +62,4 @@ public class King extends Piece {
 		}
 		return moveList;
 	}
-	@Override
-	public String getTileCode() {
-		return "K";
-	}
-
 }

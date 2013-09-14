@@ -5,6 +5,7 @@ public class Knight extends Piece {
 
 	public Knight(Player owner) {
 		super(owner);
+		pieceType = PieceType.N;
 		originalType = PieceType.N;
 	}
 
@@ -30,9 +31,4 @@ public class Knight extends Piece {
 		}
 		return moveList;
 	}
-	@Override
-	public String getTileCode() {
-		return "N";
-	}
-
 }

@@ -5,6 +5,7 @@ public class Bishop extends Piece {
 	
 	public Bishop(Player owner) {
 		super(owner);
+		pieceType = PieceType.B;
 		originalType = PieceType.B;
 	}
 
@@ -38,10 +39,4 @@ public class Bishop extends Piece {
 		
 		return moveList;
 	}
-	
-	@Override
-	public String getTileCode() {
-		return "B";
-	}
-
 }

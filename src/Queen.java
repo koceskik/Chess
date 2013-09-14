@@ -5,6 +5,7 @@ public class Queen extends Piece {
 	
 	public Queen(Player owner) {
 		super(owner);
+		pieceType = PieceType.Q;
 		originalType = PieceType.Q;
 	}
 
@@ -36,12 +37,6 @@ public class Queen extends Piece {
 				tempY += dirY[i];
 			}
 		}
-		
 		return moveList;
 	}
-	@Override
-	public String getTileCode() {
-		return "Q";
-	}
-
 }

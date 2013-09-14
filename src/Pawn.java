@@ -5,6 +5,7 @@ public class Pawn extends Piece {
 	
 	public Pawn(Player owner) {
 		super(owner);
+		pieceType = PieceType.P;
 		originalType = PieceType.P;
 	}
 
@@ -102,11 +103,4 @@ public class Pawn extends Piece {
 		}
 		return moveList;
 	}
-	@Override
-	public String getTileCode() {
-		return "P";
-	}
-	
-	
-
 }
