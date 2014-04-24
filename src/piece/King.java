@@ -1,12 +1,19 @@
+package piece;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+
 import java.util.ArrayList;
 
 public class King extends Piece {
 	private static final long serialVersionUID = 1L;
 
 	public King(Player owner) {
-		super(owner);
+		this(owner, PieceType.K);
+	}
+	public King(Player owner, PieceType originalType) {
+		super(owner, originalType);
 		pieceType = PieceType.K;
-		originalType = PieceType.K;
 	}
 
 	@Override

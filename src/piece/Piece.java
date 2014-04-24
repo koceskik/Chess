@@ -1,3 +1,9 @@
+package piece;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+import gameComponent.Tile;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -8,28 +14,41 @@ public abstract class Piece implements Serializable {
 	}
 
 	private Player owner;
+	public Player getOwner() {
+		return owner;
+	}
 	public PieceType pieceType;
-	public PieceType originalType;//necessary for pawns (bughouse)
+	protected PieceType originalType;//necessary for pawns (bughouse)
+	public PieceType getOriginalType() {
+		return originalType;
+	}
 	public Tile loc = null;
 	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
 									 //also used for King castling for efficiency event though lastTurnMoved could be used
+	public void incNumOfMovesMade() {
+		numOfMovesMade++;
+	}
 	protected int lastTurnMoved = -1;//necessary for en passant
+	public void setLastTurnMoved(int turnCount) {
+		lastTurnMoved = turnCount;
+	}
 
 	public Piece(Player owner) {
 		this.owner = owner;
 	}
+	public Piece(Player owner, PieceType originalType) {
+		this(owner);
+		this.originalType = originalType;
+	}
+	
+	
 	public PieceColor getColor() {
 		return owner.color;
-	}
-	public PieceType getOriginalType() {
-		return originalType;
-	}
-	public Player getOwner() {
-		return owner;
 	}
 	public void setOwner(Player owner) {
 		this.owner = owner; 
 	}
+	
 	public int getX() {
 		return loc.x;
 	}

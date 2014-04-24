@@ -1,4 +1,12 @@
+package gameComponent;
 import java.io.Serializable;
+
+import piece.Bishop;
+import piece.Knight;
+import piece.Piece;
+import piece.Queen;
+import piece.Rook;
+import piece.Piece.PieceType;
 
 public class Move implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -15,16 +23,16 @@ public class Move implements Serializable {
 		public static Piece getPromotion(MoveType moveType, Player owner) {
 			Piece promotion = null;
 			if(moveType == Move.MoveType.PROMOTE_QUEEN) {
-				promotion = new Queen(owner);
+				promotion = new Queen(owner, PieceType.P);
 			}
 			else if(moveType == Move.MoveType.PROMOTE_KNIGHT) {
-				promotion = new Knight(owner);
+				promotion = new Knight(owner, PieceType.P);
 			}
 			else if(moveType == Move.MoveType.PROMOTE_ROOK) {
-				promotion = new Rook(owner);
+				promotion = new Rook(owner, PieceType.P);
 			}
 			else if(moveType == Move.MoveType.PROMOTE_BISHOP) {
-				promotion = new Bishop(owner);
+				promotion = new Bishop(owner, PieceType.P);
 			}
 			return promotion;
 		}

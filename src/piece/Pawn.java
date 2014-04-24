@@ -1,12 +1,19 @@
+package piece;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+
 import java.util.ArrayList;
 
 public class Pawn extends Piece {
 	private static final long serialVersionUID = 1L;
 	
 	public Pawn(Player owner) {
-		super(owner);
+		this(owner, PieceType.P);
+	}
+	public Pawn(Player owner, PieceType originalType) {
+		super(owner, originalType);
 		pieceType = PieceType.P;
-		originalType = PieceType.P;
 	}
 
 	@Override

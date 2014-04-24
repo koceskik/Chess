@@ -1,3 +1,8 @@
+package main;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,6 +12,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import piece.Piece;
 
 public class ChessServer extends Thread {
 	private final int PLAYER_TOTAL = 2;

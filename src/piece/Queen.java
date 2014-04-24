@@ -1,12 +1,19 @@
+package piece;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+
 import java.util.ArrayList;
 
-public class Bishop extends Piece {
+public class Queen extends Piece {
 	private static final long serialVersionUID = 1L;
 	
-	public Bishop(Player owner) {
-		super(owner);
-		pieceType = PieceType.B;
-		originalType = PieceType.B;
+	public Queen(Player owner) {
+		this(owner, PieceType.Q);
+	}
+	public Queen(Player owner, PieceType originalType) {
+		super(owner, originalType);
+		pieceType = PieceType.Q;
 	}
 
 	@Override
@@ -14,8 +21,9 @@ public class Bishop extends Piece {
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		int x = getX();
 		int y = getY();
-		int[] dirX = {-1,1,1,-1};
-		int[] dirY = {1,1,-1,-1};
+		//1st half BISHOP MOVES, 2nd half ROOK MOVES
+		int[] dirX = {-1,1,1,-1,0,1,0,-1};
+		int[] dirY = {1,1,-1,-1,1,0,-1,0};
 		for(int i = 0;i<dirX.length;i++) {
 			int tempX = x+dirX[i];
 			int tempY = y+dirY[i];
@@ -36,7 +44,6 @@ public class Bishop extends Piece {
 				tempY += dirY[i];
 			}
 		}
-		
 		return moveList;
 	}
 }

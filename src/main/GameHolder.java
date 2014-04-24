@@ -1,3 +1,10 @@
+package main;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+import gameComponent.Tile;
+import gameComponent.Move.MoveType;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -14,6 +21,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
+
+import piece.Pawn;
+import piece.Piece;
+import piece.PieceColor;
 
 public class GameHolder {
 	private volatile Chess.ClientHandler self = null;

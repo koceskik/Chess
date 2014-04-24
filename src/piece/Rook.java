@@ -1,12 +1,19 @@
+package piece;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+
 import java.util.ArrayList;
 
 public class Rook extends Piece {
 	private static final long serialVersionUID = 1L;
 	
 	public Rook(Player owner) {
-		super(owner);
+		this(owner, PieceType.R);
+	}
+	public Rook(Player owner, PieceType originalType) {
+		super(owner, originalType);
 		pieceType = PieceType.R;
-		originalType = PieceType.R;
 	}
 
 	@Override

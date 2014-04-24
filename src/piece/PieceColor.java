@@ -1,3 +1,4 @@
+package piece;
 public enum PieceColor {
 	W,B;
 	

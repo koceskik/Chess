@@ -1,6 +1,16 @@
+package gameComponent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
+
+import piece.Bishop;
+import piece.King;
+import piece.Knight;
+import piece.Pawn;
+import piece.Piece;
+import piece.PieceColor;
+import piece.Queen;
+import piece.Rook;
 
 public class Player implements Serializable {
 	private static final long serialVersionUID = 1L;

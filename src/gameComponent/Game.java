@@ -1,5 +1,11 @@
+package gameComponent;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import piece.King;
+import piece.Pawn;
+import piece.Piece;
+import piece.PieceColor;
 
 public class Game implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -140,15 +146,14 @@ public class Game implements Serializable {
 				Piece promotion = Move.MoveType.getPromotion(m.moveType, turn);
 				
 				if(promotion != null) {
-					promotion.originalType = Piece.PieceType.P;
 					turn.pieceList.remove(m.toTile.getPiece());
 					turn.pieceList.add(promotion);
 					m.toTile.addPiece(promotion);
 				}
 			}
 
-			m.toTile.getPiece().lastTurnMoved = turnCount;
-			m.toTile.getPiece().numOfMovesMade++;
+			m.toTile.getPiece().setLastTurnMoved(turnCount);
+			m.toTile.getPiece().incNumOfMovesMade();
 			turnCount++;
 			turn = getOpponent();
 		}

@@ -1,9 +1,13 @@
+package gameComponent;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.HashMap;
 
 import javax.swing.ImageIcon;
+
+import piece.Piece;
+import piece.PieceColor;
 
 public class Tile implements Serializable {
 	private static final long serialVersionUID = 1L;

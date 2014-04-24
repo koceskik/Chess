@@ -1,3 +1,8 @@
+package main;
+import gameComponent.Game;
+import gameComponent.Move;
+import gameComponent.Player;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,6 +12,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import piece.Pawn;
+import piece.Piece;
 
 public class BughouseServer extends Thread {
 	private final int PLAYER_TOTAL = 4;
@@ -131,7 +139,7 @@ public class BughouseServer extends Thread {
 							
 							sendOtherBoard = !move.player.opponent.deadPieces.isEmpty();
 							for(Piece p : move.player.opponent.deadPieces) {
-								if(!(p instanceof Pawn) && p.originalType == Piece.PieceType.P) {
+								if(!(p instanceof Pawn) && p.getOriginalType() == Piece.PieceType.P) {
 									p = new Pawn(move.player.partner);
 								}
 								p.loc = null;
