@@ -9,30 +9,8 @@ import java.util.ArrayList;
 
 public abstract class Piece implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public enum PieceType {
-		P,N,B,R,Q,K;
-	}
-
-	private Player owner;
-	public Player getOwner() {
-		return owner;
-	}
-	public PieceType pieceType;
-	protected PieceType originalType;//necessary for pawns (bughouse)
-	public PieceType getOriginalType() {
-		return originalType;
-	}
-	public Tile loc = null;
-	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
-									 //also used for King castling for efficiency event though lastTurnMoved could be used
-	public void incNumOfMovesMade() {
-		numOfMovesMade++;
-	}
-	protected int lastTurnMoved = -1;//necessary for en passant
-	public void setLastTurnMoved(int turnCount) {
-		lastTurnMoved = turnCount;
-	}
-
+	
+	//Constructors
 	public Piece(Player owner) {
 		this.owner = owner;
 	}
@@ -41,19 +19,54 @@ public abstract class Piece implements Serializable {
 		this.originalType = originalType;
 	}
 	
-	
-	public PieceColor getColor() {
-		return owner.color;
+	//Fields, getters/setters
+	public enum PieceType {
+		P,N,B,R,Q,K;
+	}
+	public PieceType pieceType;
+
+	private Player owner;
+	public Player getOwner() {
+		return owner;
 	}
 	public void setOwner(Player owner) {
 		this.owner = owner; 
 	}
+	public PieceColor getColor() {
+		return owner.color;
+	}
 	
+	protected PieceType originalType;//necessary for pawns (bughouse)
+	public PieceType getOriginalType() {
+		return originalType;
+	}
+	
+	protected int numOfMovesMade = 0;//necessary for en passant: pawn moved 2 spaces in first turn
+									 //also used for King castling for efficiency event though lastTurnMoved could be used
+	public void incNumOfMovesMade() {
+		numOfMovesMade++;
+	}
+	
+	protected int lastTurnMoved = -1;//necessary for en passant
+	public void setLastTurnMoved(int turnCount) {
+		lastTurnMoved = turnCount;
+	}
+	
+	
+	public Tile loc = null;
 	public int getX() {
-		return loc.x;
+		int x = -1;
+		if(loc != null) {
+			x = loc.x;
+		}
+		return x;
 	}
 	public int getY() {
-		return loc.y;
+		int y = -1;
+		if(loc != null) {
+			y = loc.y;
+		}
+		return y;
 	}
 	
 	public abstract ArrayList<Move> getLegalMoves(Game g, boolean ignoreCheck);
