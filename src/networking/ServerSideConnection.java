@@ -15,12 +15,19 @@ public class ServerSideConnection extends Connection {
 	public void run() {
 		try {
 			while(!Thread.interrupted()) {
-				Move m = (Move) ois.readObject();
-				applyMove(m);
+				Object o = ois.readObject();
+				if(o instanceof Move) {
+					Move m = (Move) o;
+					applyMove(m);
+				}
+				else {
+					throw new RuntimeException("ServerSideConnection: Received unexpected Object type");
+				}
+				
 			}
 		}
 		catch(ClassNotFoundException e) {e.printStackTrace();}
-		catch(IOException e) {e.printStackTrace();}
+		catch(IOException e) {/*e.printStackTrace();*/}
 		finally {
 			close();
 			removeServerSideConnection(this);

@@ -68,6 +68,9 @@ public class ClientSideConnection extends Connection {
 							}
 						}
 					}
+					else {
+						throw new RuntimeException("ClientSideConnection: Received Game data before Player data");
+					}
 				}
 				else if(o instanceof Player) {
 					Player player = (Player) o;
@@ -75,13 +78,16 @@ public class ClientSideConnection extends Connection {
 						p = player;
 					}
 					else {
-						throw new RuntimeException("Received a Player more than once");//TODO: better error?
+						throw new RuntimeException("ClientSideConnection: Received a Player more than once");
 					}
+				}
+				else {
+					throw new RuntimeException("ClientSideConnection: Received unexpected Object type");
 				}
 			}
 		}
 		catch(ClassNotFoundException e) {e.printStackTrace();}
-		catch(IOException e) {e.printStackTrace();}
+		catch(IOException e) {/*e.printStackTrace();*/}
 		finally {
 			close();
 		}
