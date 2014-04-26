@@ -60,7 +60,7 @@ public class ClientSideConnection extends Connection {
 							}
 						}
 						else {
-							gh.get(game.id).updateGame(game);//TODO: this is similar to a ui callback, but CSC contains 
+							gh.get(game.id).updateGame(game); 
 							if(game.getWinner() != null) {
 								if(game.id == gh.size() - 1) {
 									break;
@@ -82,9 +82,12 @@ public class ClientSideConnection extends Connection {
 		}
 		catch(ClassNotFoundException e) {e.printStackTrace();}
 		catch(IOException e) {e.printStackTrace();}
+		finally {
+			close();
+		}
 	}
 
-	//TODO: implement UI callback methods
+	//UICallback methods
 	private void addGameHolder(GameHolder gameHolder) {
 		for(UICallback uic : subscribedUI) {
 			uic.addGameHolder(gameHolder);
