@@ -22,12 +22,14 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 
+import networking.ClientSideConnection;
 import piece.Pawn;
 import piece.Piece;
 import piece.PieceColor;
 
+//TODO: make this extend a JPanel or something, so it can be added directly
 public class GameHolder {
-	private volatile Chess.ClientHandler self = null;
+	private volatile ClientSideConnection self = null;
 	
 	private static GridBagConstraints grid = new GridBagConstraints();
 	public static final Dimension dim = new Dimension(Tile.size,Tile.size);
@@ -50,6 +52,10 @@ public class GameHolder {
 	
 	private Dimension d = null;
 	private JPanel boardPanel = new JPanel();
+	//use this to add the boardPanel to the main UI
+	public JPanel getHolderPanel() {
+		return boardPanel;
+	}
 	private JPanel whiteLabelPanel = new JPanel();
 	private JLabel whiteLabel = new JLabel();
 	private JPanel blackLabelPanel = new JPanel();
@@ -76,12 +82,11 @@ public class GameHolder {
 	public Game g = null;
 	private PieceColor pc = null;//player's or partner's color (ie color of the bottom player)
 	
-	public GameHolder(Game g, PieceColor color, JPanel location, Chess.ClientHandler self, Dimension d) {
+	public GameHolder(Game g, PieceColor color, ClientSideConnection self, Dimension d) {
 		this.g = g;
 		this.pc = color;
 		this.d = d;
 		this.self = self;
-		location.add(boardPanel);
 		initBoardPanel();
 	}
 	

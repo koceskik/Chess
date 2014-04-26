@@ -1,4 +1,4 @@
-package main;
+package networking;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,11 +6,15 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import main.UICallback;
+
 public abstract class Connection implements Runnable {
+	public static final int port = 3355;
+	
 	private Socket socket = null;
 	private ObjectOutputStream oos = null;
-	private ObjectInputStream ois = null;
-	private ArrayList<UICallback> subscribedUI = new ArrayList<UICallback>();
+	protected ObjectInputStream ois = null;
+	protected ArrayList<UICallback> subscribedUI = new ArrayList<UICallback>();
 	public void subscribe(UICallback e) {
 		subscribedUI.add(e);
 	}
@@ -36,10 +40,7 @@ public abstract class Connection implements Runnable {
 			oos.reset();//necessary to send new object, not just references
 			returner = true;
 		}
-		catch(IOException e) {
-			e.printStackTrace();
-			returner = false;
-		}
+		catch(IOException e) {e.printStackTrace();}
 		return returner;
 	}
 	
@@ -48,17 +49,19 @@ public abstract class Connection implements Runnable {
 			try {
 				oos.close();
 			}
-			catch(IOException e) {
-				e.printStackTrace();
+			catch(IOException e) {e.printStackTrace();}
+		}
+		if(ois != null) {
+			try {
+				ois.close();
 			}
+			catch(IOException e) {e.printStackTrace();}
 		}
 		if(socket != null) {
 			try {
 				socket.close();
 			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
+			catch(IOException e) {e.printStackTrace();}
 		}
 	}
 }

@@ -29,6 +29,7 @@ public class Player implements Serializable {
 	// This is incremented during bughouse games to denote that there's another board to the client 
 	public int gameCount = 0;//technically the number of games is this value+1
 							 //TODO: ISN'T THIS UNNECESSARY with the partner variable
+							 //maybe not with new implementation with UI callbacks
 
 	public Player(PieceColor pc) {
 		this(pc, 0);

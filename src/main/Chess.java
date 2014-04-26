@@ -1,33 +1,30 @@
 package main;
-import gameComponent.Game;
-import gameComponent.Move;
-import gameComponent.Player;
 
 import java.awt.CardLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import piece.PieceColor;
+import networking.BughouseServer;
+import networking.ChessServer;
+import networking.ClientSideConnection;
+import networking.Connection;
 
-public class Chess extends JFrame {
+
+public class Chess extends JFrame implements UICallback {
 	private static final long serialVersionUID = 1L;
-	private static final int port = 3355;
-	private static String serverIP = "127.0.0.1";
+	
 	private static final String initialIP = "127.0.0.1";
-	private static volatile ClientHandler self = null;
+	private static String serverIP = initialIP;
+	private static ClientSideConnection csc = null;
 
 	private GridBagConstraints grid = new GridBagConstraints();
 	private JPanel mainScreen = new JPanel();
@@ -36,9 +33,14 @@ public class Chess extends JFrame {
 	private JButton joinGame = null;
 	private JTextField ipAddress = null;
 	private JPanel gameScreen = new JPanel();
-
-	private volatile ArrayList<GameHolder> g = new ArrayList<GameHolder>();
-	private volatile Player p = null;
+	
+	//UICallback methods
+	public void addGameHolder(GameHolder gameHolder) {
+		gameScreen.add(gameHolder.getHolderPanel());
+	}
+	public void setCardPane(CardPane cp) {
+		((CardLayout)getContentPane().getLayout()).show(getContentPane(), cp.toString());
+	}
 
 	public static void main(String[] args) {
 		Chess c = new Chess();
@@ -48,13 +50,13 @@ public class Chess extends JFrame {
 	public Chess() {
 		setTitle("Chess");
 		getContentPane().setLayout(new CardLayout());
-		getContentPane().add(mainScreen, "MAIN");
-		getContentPane().add(gameScreen, "GAME");
+		getContentPane().add(mainScreen, CardPane.MAIN.toString());
+		getContentPane().add(gameScreen, CardPane.GAME.toString());
 
 		initMainScreen();
 		pack();
 
-		((CardLayout)getContentPane().getLayout()).show(getContentPane(), "MAIN");
+		setCardPane(CardPane.MAIN);
 		setSize(289,346);//the default size of the current layout of a single ChessBoard
 	}
 	public void initMainScreen() {
@@ -67,7 +69,7 @@ public class Chess extends JFrame {
 		chessGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new ChessServer().start();
-				startGame();
+				connectToServer();
 			}
 		});
 		mainScreen.add(chessGame,grid);
@@ -77,7 +79,7 @@ public class Chess extends JFrame {
 		bughouseGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new BughouseServer().start();
-				startGame();
+				connectToServer();
 			}
 		});
 		grid.gridy++;
@@ -93,7 +95,7 @@ public class Chess extends JFrame {
 					ipAddress.setText(initialIP);
 				}
 				serverIP = ipAddress.getText();
-				startGame();
+				connectToServer();
 			}
 		});
 
@@ -103,25 +105,11 @@ public class Chess extends JFrame {
 		mainScreen.add(ipAddress,grid);
 	}
 
-	public void startGame() {
-		connectToServer();//blocks until it receives Player and Game
-		for(GameHolder gh : g) {//used for generalization purposes, it could be done directly
-			if(p.gameID == gh.g.id) {
-				gh.initLabelClicks(p);
-			}
-			else {
-				gh.promotionList.setVisible(false);
-			}
-			gh.drawBoard();
-		}
-		((CardLayout)getContentPane().getLayout()).show(getContentPane(), "GAME");
-		pack();
-	}
-
 	public void connectToServer() {//get client, setup I/O streams to/from client
 		try {
-			Socket clientSocket = new Socket(serverIP, port);
-			self = new ClientHandler(clientSocket);
+			Socket clientSocket = new Socket(serverIP, Connection.port);
+			csc = new ClientSideConnection(clientSocket);
+			csc.subscribe(this);
 			System.out.println("Client socket accepted");
 			System.out.println("Created I/O streams");
 		}
@@ -130,128 +118,15 @@ public class Chess extends JFrame {
 			System.exit(1);
 		}
 		//TODO: add a display "Waiting for players"
-		self.start();
+		new Thread(csc).start();
 	}
 
 	public void closeSockets() {
-		if(self != null) {
-			self.close();
+		if(csc != null) {
+			csc.close();
 		}
 
 		System.out.println("Client Exited");
 		System.exit(0);
-	}
-
-	class ClientHandler {
-		private Socket socket = null;
-		private ObjectOutputStream oos = null;
-		private InputHandler ih = null;
-
-		public ClientHandler(Socket s) {
-			this.socket = s;
-			try {
-				oos = new ObjectOutputStream(s.getOutputStream());
-				ih = new InputHandler(s);
-			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-		public void start() {
-			p = ih.getPlayer();
-			for(int i = 0;i<p.gameCount+1;i++) {
-				Game game = ih.read();
-				PieceColor pc;
-				Dimension d;
-				if(game.id == p.gameID) {
-					pc = p.color;
-					d = GameHolder.dim;
-				}
-				else {
-					pc = p.color.getOpponent();
-					d = GameHolder.scaledDim;
-				}
-				g.add(new GameHolder(game, pc, gameScreen, this, d));
-			}
-			ih.start();
-		}
-		public void close() {
-			try {
-				if(oos != null) {
-					oos.close();
-				}
-				if(socket != null) {
-					socket.close();
-				}
-			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-		public void send(Move move) {
-			try {
-				oos.writeObject(move);
-			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		class InputHandler extends Thread {
-			private ObjectInputStream ois = null;//TODO: use public get() method, remove read(). Or incorporate read() in run()
-			public InputHandler(Socket s) {
-				try {
-					ois = new ObjectInputStream(s.getInputStream());
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
-			}
-			@Override
-			public void run() {
-				boolean doLoop = true;
-				while(doLoop) {
-					Game recGame = read();
-					if(recGame != null) {
-						g.get(recGame.id).updateGame(recGame);
-						if(recGame.getWinner() != null) {
-							if(recGame.id == g.size()-1) {
-								doLoop = false;
-							}
-						}
-					}
-					else {
-						doLoop = false;
-					}
-				}
-			}
-			public Player getPlayer() {
-				try {
-					return (Player) ois.readObject();
-				}
-				catch(ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			public Game read() {//TODO: incorporate this into the InputHandler.run() itself
-				try {
-					return (Game) ois.readObject();
-				}
-				catch(ClassNotFoundException e) {
-					//e.printStackTrace();
-					self.close();
-				}
-				catch(IOException e) {
-					//e.printStackTrace();
-					self.close();
-				}
-				return null;
-			}
-		}
 	}
 }
