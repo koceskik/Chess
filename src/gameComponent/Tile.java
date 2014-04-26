@@ -37,8 +37,9 @@ public class Tile implements Serializable {
 	}
 	public final int x;
 	public final int y;
-	private Piece piece = null;
 	private final PieceColor tileColor;
+	
+	private Piece piece = null;
 	
 	public Tile(int x, int y) {
 		this.x = x;

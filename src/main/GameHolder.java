@@ -3,7 +3,6 @@ import gameComponent.Game;
 import gameComponent.Move;
 import gameComponent.Player;
 import gameComponent.Tile;
-import gameComponent.Move.MoveType;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -160,8 +159,8 @@ public class GameHolder {
 	}
 	
 	private void initBoard() {
-		int addLine = 0;
-		if(this.g.pW.gameCount+this.g.pB.gameCount > 0) {
+		int addLine = 0;//used to add a line to make room for the heldPieces of the opponent (top of board)
+		if(this.g.pW.gameCount > 1) {
 			addLine = 1;
 		}
 		for(int i = 0;i<8;i++) {

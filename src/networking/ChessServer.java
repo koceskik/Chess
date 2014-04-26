@@ -2,8 +2,6 @@ package networking;
 import gameComponent.Game;
 import gameComponent.Move;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.Collections;
 
 import piece.Piece;
@@ -25,7 +23,6 @@ public class ChessServer extends Server implements ServerCallback {
 	
 	@Override
 	public void run() {
-		//get clients, setup ClientHandlers
 		while(playerList.size() < 2) {
 			acceptClient();
 		}

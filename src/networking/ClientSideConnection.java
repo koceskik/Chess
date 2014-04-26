@@ -30,7 +30,7 @@ public class ClientSideConnection extends Connection {
 					Game game = (Game) o;
 					
 					if(p != null) {
-						if(gh.size() < p.gameCount+1) {
+						if(gh.size() < p.gameCount) {
 							PieceColor pc;
 							Dimension d;
 							if(game.id == p.gameID) {
@@ -45,8 +45,8 @@ public class ClientSideConnection extends Connection {
 							gh.add(gameHolder);
 							addGameHolder(gameHolder);
 							
-							if(gh.size() == p.gameCount+1) {
-								for(GameHolder gHolder : gh) {//used for generalization purposes, it could be done directly
+							if(gh.size() == p.gameCount) {
+								for(GameHolder gHolder : gh) {
 									if(p.gameID == gHolder.g.id) {
 										gHolder.initLabelClicks(p);
 									}

@@ -117,7 +117,9 @@ public class Chess extends JFrame implements UICallback {
 			System.out.println("Failed to accept client/create I/O streams");
 		}
 		//TODO: add a display "Waiting for players"
-		new Thread(csc).start();
+		Thread t = new Thread(csc);
+		t.setDaemon(true);
+		t.start();
 	}
 
 	public void closeSockets() {
@@ -126,6 +128,5 @@ public class Chess extends JFrame implements UICallback {
 		}
 
 		System.out.println("Client Exited");
-		System.exit(0);
 	}
 }

@@ -2,8 +2,6 @@ package networking;
 import gameComponent.Game;
 import gameComponent.Move;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -34,7 +32,6 @@ public class BughouseServer extends Server implements ServerCallback {
 	}
 	@Override
 	public void run() {
-		//get clients, setup ClientHandlers
 		while(playerList.size() < PLAYER_TOTAL) {
 			acceptClient();
 		}
@@ -64,7 +61,6 @@ public class BughouseServer extends Server implements ServerCallback {
 		int gameID = m.player.gameID;
 		boolean validMove = g.get(gameID).applyMove(m);//handles legal checks
 		int totalLegalMoves = 0;
-		boolean sendOtherBoard = false;//set in if(validMove), used before sending to clients
 		for(Piece p : g.get(gameID).turn.pieceList) {
 			totalLegalMoves += p.getLegalMoves(g.get(gameID), false).size();
 		}
@@ -76,6 +72,7 @@ public class BughouseServer extends Server implements ServerCallback {
 			g.get(1).setWinner(g.get(gameID).getOpponent());
 		}
 		
+		boolean sendOtherBoard = false;
 		if(validMove) {
 			m = new Move(m, g.get(m.player.gameID));//dereference from the Game, necessary for the server
 			m.player.pickupQueue();
