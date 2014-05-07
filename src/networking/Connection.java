@@ -12,7 +12,7 @@ public abstract class Connection implements Runnable {
 	private ObjectOutputStream oos = null;
 	protected ObjectInputStream ois = null;
 
-	public Connection(Socket s) {
+	protected Connection(Socket s) {
 		this.socket = s;
 		try {
 			oos = new ObjectOutputStream(s.getOutputStream());
