@@ -26,8 +26,9 @@ import piece.Pawn;
 import piece.Piece;
 import piece.PieceColor;
 
-//TODO: make this extend a JPanel or something, so it can be added directly
-public class GameHolder {
+public class GameHolderPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
+
 	private volatile ClientSideConnection self = null;
 	
 	private static GridBagConstraints grid = new GridBagConstraints();
@@ -50,11 +51,7 @@ public class GameHolder {
 	public JComboBox<String> promotionList = new JComboBox<String>(promotionString);
 	
 	private Dimension d = null;
-	private JPanel boardPanel = new JPanel();
-	//use this to add the boardPanel to the main UI
-	public JPanel getHolderPanel() {
-		return boardPanel;
-	}
+	
 	private JPanel whiteLabelPanel = new JPanel();
 	private JLabel whiteLabel = new JLabel();
 	private JPanel blackLabelPanel = new JPanel();
@@ -81,16 +78,16 @@ public class GameHolder {
 	public Game g = null;
 	private PieceColor pc = null;//player's or partner's color (ie color of the bottom player)
 	
-	public GameHolder(Game g, PieceColor color, ClientSideConnection self, Dimension d) {
+	public GameHolderPanel(Game g, PieceColor color, ClientSideConnection self, Dimension d) {
 		this.g = g;
 		this.pc = color;
 		this.d = d;
 		this.self = self;
-		initBoardPanel();
+		initPanel();
 	}
 	
-	private void initBoardPanel() {
-		boardPanel.setLayout(new GridBagLayout());
+	private void initPanel() {
+		setLayout(new GridBagLayout());
 		float fontSizeScaled = 9.0f;//this needs to be a float because int references the style not fontSize 
 		
 		whiteLabel.setText("White");
@@ -101,7 +98,7 @@ public class GameHolder {
 		if(d != dim) grid.gridwidth = 3;
 		grid.gridx = 1;
 		grid.gridy = 0;
-		boardPanel.add(whiteLabelPanel, grid);
+		add(whiteLabelPanel, grid);
 		
 		blackLabel.setText("Black");
 		if(d != dim) blackLabel.setFont(blackLabel.getFont().deriveFont(fontSizeScaled));
@@ -111,12 +108,12 @@ public class GameHolder {
 		grid.gridx = 3;
 		if(d != dim) grid.gridx = 4;
 		grid.gridy = 0;
-		boardPanel.add(blackLabelPanel,grid);
+		add(blackLabelPanel,grid);
 		
 		grid.gridwidth = 3;
 		grid.gridx = 5;
 		grid.gridy = 0;
-		boardPanel.add(promotionList, grid);
+		add(promotionList, grid);
 		
 		for(int i = 0;i<30;i++) {//30 is the maximum number of held pieces: 16P, 4N, 4B, 4R, 2Q
 			JLabel newHeldPiece = new JLabel();
@@ -145,13 +142,13 @@ public class GameHolder {
 			oppHeldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));
 			oppHeldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 			oppHeldPiecesScrollPane.setBorder(nullBorder);
-			boardPanel.add(oppHeldPiecesScrollPane, grid);
+			add(oppHeldPiecesScrollPane, grid);
 			
 			grid.gridy = 12;
 			heldPiecesScrollPane.setPreferredSize(new Dimension(grid.gridwidth*d.width, 2*Tile.scaledSize+1));
 			heldPiecesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 			heldPiecesScrollPane.setBorder(nullBorder);
-			boardPanel.add(heldPiecesScrollPane, grid);
+			add(heldPiecesScrollPane, grid);
 		}
 		
 		grid.gridwidth = 1;
@@ -173,13 +170,13 @@ public class GameHolder {
 			}
 			grid.gridx = 0;
 			grid.gridy = i+2+addLine;
-			boardPanel.add(yAxisLabel[i],grid);
+			add(yAxisLabel[i],grid);
 			for(int j = 0;j<8;j++) {
 				label[i][j] = new JLabel();
 				label[i][j].setPreferredSize(d);//necessary to prevent the resizing onClick (adds border)
 				grid.gridx = j+1;
 				grid.gridy = i+2+addLine;
-				boardPanel.add(label[i][j],grid);
+				add(label[i][j],grid);
 			}
 		}
 		grid.gridy = 10+addLine;
@@ -192,7 +189,7 @@ public class GameHolder {
 				xAxisLabel[i].setText(String.valueOf((char) (97+7-i)));
 			}
 			grid.gridx = i+1;
-			boardPanel.add(xAxisLabel[i],grid);
+			add(xAxisLabel[i],grid);
 		}
 	}
 	

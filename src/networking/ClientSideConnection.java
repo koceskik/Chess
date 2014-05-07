@@ -9,12 +9,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import main.CardPane;
-import main.GameHolder;
+import main.GameHolderPanel;
 import main.UICallback;
 import piece.PieceColor;
 
 public class ClientSideConnection extends Connection {
-	private volatile ArrayList<GameHolder> gh = new ArrayList<GameHolder>();
+	private volatile ArrayList<GameHolderPanel> gh = new ArrayList<GameHolderPanel>();
 	private volatile Player p = null;
 
 	public ClientSideConnection(Socket s) {
@@ -35,18 +35,18 @@ public class ClientSideConnection extends Connection {
 							Dimension d;
 							if(game.id == p.gameID) {
 								pc = p.color;
-								d = GameHolder.dim;
+								d = GameHolderPanel.dim;
 							}
 							else {
 								pc = p.color.getOpponent();
-								d = GameHolder.scaledDim;
+								d = GameHolderPanel.scaledDim;
 							}
-							GameHolder gameHolder = new GameHolder(game, pc, this, d); 
+							GameHolderPanel gameHolder = new GameHolderPanel(game, pc, this, d); 
 							gh.add(gameHolder);
 							addGameHolder(gameHolder);
 							
 							if(gh.size() == p.gameCount) {
-								for(GameHolder gHolder : gh) {
+								for(GameHolderPanel gHolder : gh) {
 									if(p.gameID == gHolder.g.id) {
 										gHolder.initLabelClicks(p);
 									}
@@ -94,7 +94,7 @@ public class ClientSideConnection extends Connection {
 	}
 
 	//UICallback methods
-	private void addGameHolder(GameHolder gameHolder) {
+	private void addGameHolder(GameHolderPanel gameHolder) {
 		for(UICallback uic : subscribedUI) {
 			uic.addGameHolder(gameHolder);
 		}

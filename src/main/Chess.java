@@ -35,8 +35,8 @@ public class Chess extends JFrame implements UICallback {
 	private JPanel gameScreen = new JPanel();
 	
 	//UICallback methods
-	public void addGameHolder(GameHolder gameHolder) {
-		gameScreen.add(gameHolder.getHolderPanel());
+	public void addGameHolder(GameHolderPanel gameHolder) {
+		gameScreen.add(gameHolder);
 	}
 	public void setCardPane(CardPane cp) {
 		((CardLayout)getContentPane().getLayout()).show(getContentPane(), cp.toString());
@@ -69,6 +69,7 @@ public class Chess extends JFrame implements UICallback {
 		chessGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new ChessServer().start();
+				joinGame.setEnabled(false);
 				connectToServer();
 			}
 		});
@@ -79,6 +80,7 @@ public class Chess extends JFrame implements UICallback {
 		bughouseGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new BughouseServer().start();
+				joinGame.setEnabled(false);
 				connectToServer();
 			}
 		});
@@ -95,6 +97,7 @@ public class Chess extends JFrame implements UICallback {
 					ipAddress.setText(initialIP);
 				}
 				serverIP = ipAddress.getText();
+				joinGame.setEnabled(false);
 				connectToServer();
 			}
 		});
@@ -115,6 +118,7 @@ public class Chess extends JFrame implements UICallback {
 		}
 		catch(IOException ex) {
 			System.out.println("Failed to accept client/create I/O streams");
+			joinGame.setEnabled(true);
 		}
 		//TODO: add a display "Waiting for players"
 		Thread t = new Thread(csc);
