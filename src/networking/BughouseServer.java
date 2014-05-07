@@ -73,10 +73,10 @@ public class BughouseServer extends Server implements ServerCallback {
 		}
 		
 		boolean sendOtherBoard = false;
-		if(validMove) {
+		if(validMove) {//if valid move, handle piece transfer,pickup
 			m = new Move(m, g.get(m.player.gameID));//dereference from the Game, necessary for the server
-			m.player.pickupQueue();
-			m.player.opponent.pickupQueue();
+			m.player.pickUpQueue();
+			m.player.opponent.pickUpQueue();
 			
 			sendOtherBoard = !m.player.opponent.deadPieces.isEmpty();
 			for(Piece p : m.player.opponent.deadPieces) {

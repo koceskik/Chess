@@ -4,8 +4,16 @@ import gameComponent.Move;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerSideConnection extends Connection {
+	private ArrayList<ServerCallback> subscribedServers = new ArrayList<ServerCallback>();
+	public void subscribe(ServerCallback e) {
+		subscribedServers.add(e);
+	}
+	public void unsubscribe(ServerCallback e) {
+		subscribedServers.remove(e);
+	}
 
 	public ServerSideConnection(Socket s) {
 		super(s);

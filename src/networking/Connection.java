@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-
-import main.UICallback;
 
 public abstract class Connection implements Runnable {
 	public static final int port = 3355;
@@ -14,23 +11,6 @@ public abstract class Connection implements Runnable {
 	private Socket socket = null;
 	private ObjectOutputStream oos = null;
 	protected ObjectInputStream ois = null;
-	
-	//TODO: move these to their respective child classes, or figure out a generalization process to merge them
-	protected ArrayList<UICallback> subscribedUI = new ArrayList<UICallback>();
-	protected ArrayList<ServerCallback> subscribedServers = new ArrayList<ServerCallback>();
-	public void subscribe(UICallback e) {
-		subscribedUI.add(e);
-	}
-	public void unsubscribe(UICallback e) {
-		subscribedUI.remove(e);
-	}
-	
-	public void subscribe(ServerCallback e) {
-		subscribedServers.add(e);
-	}
-	public void unsubscribe(ServerCallback e) {
-		subscribedServers.remove(e);
-	}
 
 	public Connection(Socket s) {
 		this.socket = s;

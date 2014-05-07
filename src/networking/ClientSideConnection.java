@@ -16,6 +16,14 @@ import piece.PieceColor;
 public class ClientSideConnection extends Connection {
 	private volatile ArrayList<GameHolderPanel> gh = new ArrayList<GameHolderPanel>();
 	private volatile Player p = null;
+	
+	private ArrayList<UICallback> subscribedUI = new ArrayList<UICallback>();
+	public void subscribe(UICallback e) {
+		subscribedUI.add(e);
+	}
+	public void unsubscribe(UICallback e) {
+		subscribedUI.remove(e);
+	}
 
 	public ClientSideConnection(Socket s) {
 		super(s);

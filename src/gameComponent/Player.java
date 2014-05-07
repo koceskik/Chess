@@ -28,7 +28,7 @@ public class Player implements Serializable {
 	public Player opponent = null;
 	public Player partner = null;
 	
-	// This is incremented during bughouse games to denote that there's another board to the client 
+	// Incremented during bughouse games to inform client of multiple boards (for display purposes)
 	public int gameCount = 1;//TODO: ISN'T THIS UNNECESSARY with the partner variable
 							 //maybe not with new implementation with UI callbacks
 
@@ -56,10 +56,8 @@ public class Player implements Serializable {
 		return id.equals(p.id);
 	}
 	
-	public void pickupQueue() {
-		for(Piece p : queuingPieces) {
-			heldPieces.add(p);
-		}
+	public void pickUpQueue() {
+		heldPieces.addAll(queuingPieces);
 		queuingPieces.clear();
 	}
 }

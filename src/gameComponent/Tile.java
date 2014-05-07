@@ -9,6 +9,7 @@ import javax.swing.ImageIcon;
 import piece.Piece;
 import piece.PieceColor;
 
+/**A chess tile. Contains a location and a Piece which is currently on it. Statically loads image files; abstracts the drawing of a tile+piece.*/
 public class Tile implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
