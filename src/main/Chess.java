@@ -43,6 +43,7 @@ public class Chess extends JFrame implements UICallback {
 	}
 
 	public static void main(String[] args) {
+		System.out.println("ABC");
 		Chess c = new Chess();
 		c.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		c.setVisible(true);
